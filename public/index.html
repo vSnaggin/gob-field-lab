@@ -120,7 +120,7 @@
     @media(prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto !important; } }
   </style>
   <script type="importmap">
-    {"imports":{"three":"/vendor/three.module.js","three/addons/controls/OrbitControls.js":"/vendor/OrbitControls.js"}}
+    {"imports":{"three":"./vendor/three.module.js","three/addons/controls/OrbitControls.js":"./vendor/OrbitControls.js"}}
   </script>
 </head>
 <body>
@@ -216,7 +216,7 @@ import {
   gasHeadRestriction, fluidRates, buildFluidTable, sampleFluids, cueAt,
   TEACHING_DISCLAIMER, SQRT_LAW_FOOTNOTE, inflowModeLabel, formatTeachingTelemetry,
   PROCESS_MODES, DEFAULT_PROCESS_MODE, resolveProcessParams
-} from '/process-model.js';
+} from './process-model.js';
 // ---------- End pure model ----------
 
 // ---------- Voice policy: NEVER allow an implicit or novelty fallback ----------
@@ -265,7 +265,7 @@ class Narrator {
     if (scenario !== this.scenario) {
       this.generation++; this.pendingPlay = false; this.blocked = false;
       this.audio.pause(); this.scenario = ['dry', 'wet'].includes(scenario) ? scenario : 'seep';
-      this.audio.src = `/audio/narration-${this.scenario}.mp3`; this.audio.load(); force = true;
+      this.audio.src = `./audio/narration-${this.scenario}.mp3`; this.audio.load(); force = true;
     }
     if (force) this.blocked = false;
     this.position(force);
@@ -355,7 +355,7 @@ function rockMaterial(kind, renderer) {
   const material = new THREE.MeshStandardMaterial({ map: textures[0], bumpMap: textures[1], bumpScale: kind === 'coal' ? .10 : .075, displacementMap: textures[1], displacementScale: .045, displacementBias: -.0225, roughnessMap: textures[2], roughness: 1, metalness: kind === 'coal' ? .08 : 0, vertexColors: true, envMapIntensity: kind === 'coal' ? .8 : .35 });
   const loader = new THREE.TextureLoader();
   Promise.all(['color','normal','roughness','height'].map(channel => new Promise(resolve => {
-    loader.load(`/textures/${kind}-${channel}.jpg`, texture => {
+    loader.load(`./textures/${kind}-${channel}.jpg`, texture => {
       texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
       texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
       texture.colorSpace = channel === 'color' ? THREE.SRGBColorSpace : THREE.NoColorSpace;
@@ -942,7 +942,7 @@ function rebuildFluidTables() {
 let fluids = sampleFluids(tables.seep, 0), cue = cueAt(0, 'seep', fluids);
 const pausePath = 'M6 5h4v14H6zm8 0h4v14h-4z', playPath = 'm8 5 11 7-11 7z';
 let narrationCaptions=null, lastSubtitle='';
-fetch('/audio/chapters.json').then(response=>{if(!response.ok)throw new Error('Captions unavailable');return response.json();}).then(data=>{narrationCaptions=data;refreshUI(true);}).catch(()=>{});
+fetch('./audio/chapters.json').then(response=>{if(!response.ok)throw new Error('Captions unavailable');return response.json();}).then(data=>{narrationCaptions=data;refreshUI(true);}).catch(()=>{});
 function updateSubtitle() {
   const seconds=state.t*SIM_SECONDS/100;
   const chapter=narrationCaptions?.chapters?.[state.scenario]?.[cue.id];

@@ -1,0 +1,1104 @@
+<!doctype html>
+<!--
+  Gob Field Lab — private hosted edition.
+  Open in a JavaScript-capable browser, or place this file on any static HTTPS host.
+  Graphics dependencies are served from this same private Site.
+  Cinematic cutaway with local assets and recorded HeyGen narration.
+  Geometry and rates are illustrative engineering inputs, not a calibrated mine model.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0d151c">
+  <meta name="description" content="A narrated, interactive longwall and gob-well cutaway with caving, fracture flow and water loading.">
+  <title>Gob Field Lab · Longwall Cutaway</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='9' fill='%23101b24'/%3E%3Cpath d='M6 29h28M6 22h28M6 15h28M23 6v25' stroke='%23b9c9c8' stroke-width='3'/%3E%3C/svg%3E">
+  <style>
+    :root { color-scheme:dark; font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; color:#e7ecee; background:#0d151c; --muted:#a2b2be; --line:#b3cfde20; --glass:#15212cdc; --accent:#c0d7ce; }
+    * { box-sizing:border-box; }
+    html,body { margin:0; width:100%; height:100%; overscroll-behavior:none; }
+    body { background:radial-gradient(ellipse at 50% 43%,#192b38 0,#0c151e 50%,#03080d 100%); }
+    button,input,select,summary { font:inherit; -webkit-tap-highlight-color:transparent; }
+    button,select,summary { touch-action:manipulation; }
+    button { min-width:44px; min-height:44px; border:0; border-radius:10px; background:transparent; color:inherit; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:7px; }
+    button:hover { background:#d2e2ed12; }
+    button:disabled { opacity:.4; cursor:default; }
+    button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,a:focus-visible { outline:2px solid #cee5dc; outline-offset:2px; }
+    button svg { width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; flex:none; }
+    [hidden] { display:none !important; }
+    .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+    #app { height:100vh; height:100dvh; display:grid; grid-template-rows:auto minmax(120px,1fr) auto; padding:max(8px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left)); gap:0; overflow:hidden; }
+    :root { --glass:#0b151ed9; --line:#b3cfde19; --accent:#e1c49a; }
+    .topbar { max-width:1100px; width:100%; margin:0 auto; }
+    #stage::after { content:''; position:absolute; inset:0; pointer-events:none; box-shadow:inset 0 0 80px #02081060; border-radius:12px; }
+    .view-tools { position:absolute; z-index:1; right:3px; top:10px; display:flex; gap:4px; }
+    .view-tools button { font-size:12px; padding:0 12px; background:#0a141daa; border:1px solid #cadde315; border-radius:8px; }
+    .view-tools button[aria-pressed="true"] { color:#ecd2ae; border-color:#d7b77d55; }
+    .subtitle { border-left:2px solid #c1a27688 !important; }
+    #subtitle { font-weight:450; letter-spacing:.002em; }
+    .subtitle-progress { display:block; height:2px; margin-top:9px; background:#bac8d213; border-radius:2px; overflow:hidden; }
+    .subtitle-progress i { display:block; height:100%; width:0; background:#dcc29888; }
+    @media(min-width:900px) and (min-height:600px) { #dock { max-width:760px; } #subtitle { min-height:2.9em; } }
+    .glass { background:var(--glass); border:1px solid var(--line); box-shadow:0 8px 32px #0002; -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px); }
+    .topbar { position:relative; border-radius:13px; padding:4px 6px 4px 14px; display:flex; align-items:center; justify-content:space-between; gap:8px; z-index:2; }
+    .brand { min-width:0; }
+    h1 { font-size:15px; font-weight:600; letter-spacing:.02em; margin:0; white-space:nowrap; }
+    .brand small { display:block; font-size:12px; margin-top:3px; color:var(--muted); }
+    .top-actions { display:flex; align-items:center; gap:2px; flex:none; }
+    #status { font-size:12px; font-weight:500; color:#c8d9d0; background:#71968118; border-radius:5px; padding:5px 8px; white-space:nowrap; }
+    #status[data-state="caving"] { color:#e2ca9c; background:#ad895321; }
+    #status[data-state="loaded"] { color:#afd0e7; background:#548eb329; }
+    #audio-button[aria-pressed="true"] { color:#c3ded2; background:#9ec3af12; }
+    #stage { position:relative; min-height:0; overflow:hidden; }
+    #scene { display:block; width:100%; height:100%; touch-action:none; outline:none; }
+    .scene-note { position:absolute; top:13px; left:6px; pointer-events:none; color:#a4b7c3; font-size:12px; line-height:1.6; text-shadow:0 1px 5px #000; }
+    .scene-note strong { color:#d2dfe6; font-weight:500; }
+    .view-button { position:absolute; right:1px; bottom:4px; background:#10202b99; font-size:12px; padding:0 11px; }
+    .orbit-hint { position:absolute; bottom:17px; left:6px; color:#9eafba; font-size:12px; pointer-events:none; }
+    #boot { position:absolute; left:50%; top:45%; transform:translate(-50%,-50%); width:min(330px,90%); padding:20px; border-radius:12px; text-align:center; font-size:15px; line-height:1.5; z-index:4; }
+    #boot p { margin:0 0 10px; }
+    #boot button { background:#cadfd1; color:#12201a; padding:0 18px; margin:auto; }
+    #dock { width:100%; max-width:820px; margin:0 auto; display:grid; gap:7px; z-index:2; }
+    .subtitle { border-radius:12px; padding:11px 14px; }
+    .subtitle-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:5px; }
+    #chapter { font-size:12px; letter-spacing:.055em; text-transform:uppercase; color:#adc8c3; }
+    #speech-state { color:var(--muted); font-size:12px; text-align:right; }
+    #subtitle { font-size:15px; line-height:1.45; margin:0; min-height:2.9em; max-height:6em; overflow-y:auto; }
+    .transport { padding:4px 5px; border-radius:12px; display:grid; grid-template-columns:44px minmax(40px,1fr) 48px 44px; align-items:center; gap:5px; }
+    #play { background:#c1d6c9; color:#14251d; }
+    #play:hover { background:#d0e3d7; }
+    #timeline { width:100%; height:44px; margin:0; padding:0; accent-color:#c4d7cc; cursor:pointer; background:transparent; -webkit-appearance:none; appearance:none; }
+    #timeline::-webkit-slider-runnable-track { height:4px; border-radius:4px; background:linear-gradient(to right,#bbd2c5 0%,#bbd2c5 var(--progress,0%),#ffffff22 var(--progress,0%),#ffffff22 100%); }
+    #timeline::-webkit-slider-thumb { -webkit-appearance:none; width:17px; height:17px; border-radius:50%; background:#d8e7de; margin-top:-6.5px; box-shadow:0 0 0 5px #bdd7cb10; }
+    #timeline::-moz-range-track { height:4px; border-radius:4px; background:#ffffff22; }
+    #timeline::-moz-range-progress { background:#bbd2c5; height:4px; }
+    #timeline::-moz-range-thumb { width:17px; height:17px; border:0; border-radius:50%; background:#d8e7de; }
+    #progress-text { font-size:12px; font-variant-numeric:tabular-nums; color:#c4d2d9; text-align:center; }
+    #telemetry-toggle[aria-expanded="true"] svg { transform:rotate(180deg); }
+    #telemetry { padding:13px; border-radius:12px; max-height:min(36dvh,max(64px,calc(100dvh - 480px))); overflow:auto; scrollbar-width:thin; }
+    .metrics { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
+    .metric-label { font-size:12px; color:var(--muted); display:block; line-height:1.4; }
+    .metric-value { display:block; font-size:20px; font-weight:450; font-variant-numeric:tabular-nums; margin-top:4px; }
+    .metric-value small { font-size:12px; font-weight:400; color:var(--muted); }
+    .meter { display:block; height:3px; border-radius:3px; background:#c6dbea15; overflow:hidden; margin-top:7px; }
+    .meter i { display:block; height:100%; width:0; background:#a9c7b8; }
+    .meter.water i { background:#7ba8bc; }
+    .settings { margin-top:13px; padding-top:9px; border-top:1px solid var(--line); display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .settings label { font-size:12px; color:var(--muted); display:block; }
+    select { display:block; width:100%; min-height:44px; font-size:13px; margin-top:3px; padding:8px; border:1px solid var(--line); border-radius:7px; background:#182733; color:#e2eaf0; }
+    .smallprint { color:#9dafba; font-size:12px; line-height:1.5; margin:10px 0 0; }
+    .teaching-banner { margin:0 0 10px; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:#e1c49a; }
+    .teaching-rates { margin-top:10px; padding-top:10px; border-top:1px solid var(--line); grid-template-columns:repeat(5,minmax(0,1fr)); }
+    .teaching-rates .metric-value { font-size:16px; }
+    #sqrt-law-note { margin-top:8px; }
+    details summary { min-height:44px; display:flex; align-items:center; cursor:pointer; color:#c1d0d8; font-size:13px; }
+    details summary::before { content:'+'; margin-right:8px; }
+    details[open] summary::before { content:'−'; }
+    details p { color:#b5c4ce; font-size:13px; line-height:1.6; margin:6px 0 12px; }
+    a { color:#bfdacb; text-underline-offset:3px; }
+    details a { display:block; min-height:44px; padding:10px 0; }
+    @media(max-width:600px) {
+      .topbar { padding-left:10px; } h1 { font-size:14px; } .brand { padding-bottom:22px; } .brand small { display:none; }
+      #status { position:absolute; left:10px; bottom:7px; top:auto; right:auto; padding:1px 6px; z-index:3; } .top-actions { gap:0; }
+      .scene-note { max-width:50%; font-size:12px; top:13px; } .scene-note .optional { display:none; }
+      .metrics { grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px 18px; }
+      .teaching-rates { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      #subtitle { font-size:14px; line-height:1.45; min-height:4.35em; max-height:5.8em; }
+      .subtitle { padding:9px 12px; } .subtitle-head { margin-bottom:4px; }
+      .orbit-hint { bottom:17px; font-size:12px; } .view-button span { display:none; }
+    }
+    @media(max-height:520px) and (orientation:landscape) {
+      #app { grid-template-columns:minmax(0,1fr) minmax(280px,34%); grid-template-rows:auto minmax(0,1fr); column-gap:9px; }
+      .topbar { grid-column:1/-1; } .brand { padding-bottom:0; } .brand small { display:none; } #stage { grid-column:1; grid-row:2; }
+      #dock { grid-column:2; grid-row:2; align-self:end; max-height:100%; overflow:auto; padding-top:8px; }
+      .metrics { grid-template-columns:1fr 1fr; } #telemetry { max-height:42dvh; }
+      .settings { grid-template-columns:1fr; } .scene-note .optional,.orbit-hint { display:none; }
+      #subtitle { font-size:14px; min-height:4.35em; max-height:7.25em; }
+      #status { position:static; }
+    }
+    @media(prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto !important; } }
+  </style>
+  <script type="importmap">
+    {"imports":{"three":"/vendor/three.module.js","three/addons/controls/OrbitControls.js":"/vendor/OrbitControls.js"}}
+  </script>
+</head>
+<body>
+  <div id="app" data-ready="false">
+    <header class="topbar glass">
+      <div class="brand"><h1>GOB FIELD LAB</h1><small>Longwall / cinematic cutaway</small></div>
+      <div class="top-actions">
+        <span id="status" data-state="intact" role="status">Intact</span>
+        <button id="audio-button" aria-label="Mute narration" aria-pressed="true" title="Narration on" disabled>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 5 5 9H2v6h3l5 4z"/><path id="audio-waves" d="M14 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/><path id="audio-slash" d="m15 9 6 6m0-6-6 6" hidden/></svg>
+        </button>
+        <button id="reset" aria-label="Reset simulation and camera" title="Reset" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10a8 8 0 1 1 1 8M4 4v6h6"/></svg></button>
+      </div>
+    </header>
+    <main id="stage" aria-label="Interactive longwall mining cutaway">
+      <canvas id="scene" tabindex="0" aria-label="3D cutaway. Drag to orbit; pinch or scroll to zoom. Use the View button to restore the camera."></canvas>
+      <div class="scene-note"><strong>Pottsville coal interval</strong><br>Mary Lee context · illustrative geometry<br><span class="optional">Pale trails: gas · Blue: water</span></div>
+      <div class="view-tools" aria-label="Camera views"><button id="cinema" aria-pressed="true" title="Follow the process with a guided camera" disabled>Cinema</button><button id="well-view" aria-pressed="false" title="Inspect the casing and fluids" disabled>Well</button></div>
+      <div class="orbit-hint">Drag to orbit · Pinch to zoom</div>
+      <button id="home" class="view-button" aria-label="Reset camera view" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 9 5v8l-9 5-9-5V8zm0 0v10m-9-5 9 5 9-5m-9 5v8"/></svg><span>View</span></button>
+      <div id="boot" class="glass" role="status"><p id="boot-message">Preparing the cutaway…</p><button id="reload" hidden>Reload</button></div>
+    </main>
+    <footer id="dock">
+      <section class="subtitle glass" aria-label="Synchronized explanation">
+        <div class="subtitle-head"><span id="chapter">01 / Before mining</span><span id="speech-state">Tap Play for narration</span></div>
+        <p id="subtitle" aria-live="off">Beneath the surface, solid coal still supports the roof.</p>
+        <span class="subtitle-progress" aria-hidden="true"><i id="chapter-progress"></i></span>
+      </section>
+      <section class="transport glass" aria-label="Playback controls">
+        <button id="play" aria-label="Play simulation" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path id="play-symbol" d="m8 5 11 7-11 7z" fill="currentColor" stroke="none"/></svg></button>
+        <label class="sr-only" for="timeline">Mining timeline</label><input id="timeline" type="range" min="0" max="100" value="0" step="0.1" aria-valuetext="Before mining" disabled>
+        <output id="progress-text" for="timeline">0%</output>
+        <button id="telemetry-toggle" aria-label="Show telemetry and settings" aria-expanded="false" aria-controls="telemetry"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 14 6-6 6 6M4 20h16"/></svg></button>
+      </section>
+      <section id="telemetry" class="glass" aria-label="Live telemetry and settings" hidden>
+        <p class="teaching-banner" id="teaching-banner">ILLUSTRATIVE · not calibrated</p>
+        <div class="metrics">
+          <div><span class="metric-label">Face advance</span><output class="metric-value"><span id="face-value">0.0</span> <small>m</small></output></div>
+          <div><span class="metric-label">Methane rate · normalized</span><output class="metric-value" id="gas-value">0.00</output><span class="meter"><i id="gas-meter"></i></span></div>
+          <div><span class="metric-label">Borehole water level</span><output class="metric-value"><span id="water-value">0.00</span> <small>m</small></output><span class="meter water"><i id="water-meter"></i></span></div>
+          <div><span class="metric-label">Backpressure at gas inlet</span><output class="metric-value"><span id="pressure-value">0.0</span> <small>kPa</small></output></div>
+        </div>
+        <div class="metrics teaching-rates" aria-label="Illustrative teaching rates during scrub">
+          <div><span class="metric-label">Inflow mode</span><output class="metric-value" id="inflow-mode">Small seep</output></div>
+          <div><span class="metric-label">Head · kPa</span><output class="metric-value"><span id="teach-head">0.0</span></output></div>
+          <div><span class="metric-label">Gas · norm.</span><output class="metric-value" id="teach-gas">0.00</output></div>
+          <div><span class="metric-label">Carry · L/min</span><output class="metric-value" id="carry-value">0.000</output></div>
+          <div><span class="metric-label">Connection</span><output class="metric-value" id="connection-value">0.00</output></div>
+        </div>
+        <div class="settings">
+          <label for="process-mode">Process mode<select id="process-mode" aria-describedby="sqrt-law-note"><option value="illustrative" selected>Illustrative (teaching)</option><option value="calibrated">Calibrated ranges (literature)</option></select></label>
+          <label for="water-source">Water connection<select id="water-source"><option value="dry">Dry fractures</option><option value="seep" selected>Small seep</option><option value="wet">Strong water entry</option></select></label>
+          <label for="voice-select">Narrator<select id="voice-select" disabled><option>Orson · recorded AI narration</option></select></label>
+          <label for="quality">Graphics quality<select id="quality"><option value="auto" selected>Auto · adapt to this device</option><option value="cinematic">Cinematic · maximum detail</option><option value="smooth">Smooth · lower power</option></select></label>
+        </div>
+        <p id="flow-explanation" class="smallprint">Illustrative inputs. Water height is measured upward from the bore bottom.</p>
+        <p id="sqrt-law-note" class="smallprint">Water head restricts gas via √(1−head/drive) under the assumed 14 kPa drive — teaching clarity, not new physics. Rates shown while scrubbing are illustrative / not calibrated.</p>
+        <details>
+          <summary>Model basis and assumptions</summary>
+          <p>This is a kinematic teaching model. Immediate-roof fragments cave after the shields pass; the main roof bends, separates and shears above them. Fragment contact and gas flow are approximations. The slotted completion is a conceptual example requested for this view, not a documented completion of RGGS 12-12-04.</p>
+          <p>The model spans 52 m of face advance over an assumed 12-hour mining interval. The illustrative bore has a 0.20 m internal diameter, a dominant gas inlet 1.20 m above its bottom, and 14 kPa of available gas-driving pressure. Casing width is visually enlarged; the full overburden between this cut interval and the surface wellhead is omitted. Freshwater density is 1,000 kg/m³. Inlet backpressure is ρg times water height above that inlet; water below it does not impose a full liquid head on incoming gas. Inflow, carrying capacity, beds and production are uncalibrated by default.</p>
+          <p>Process mode <strong>Illustrative (teaching)</strong> keeps those scrub-cleared defaults. <strong>Calibrated ranges (literature)</strong> swaps labeled engineering defaults: 30 kPa drive (typical active gob-ventilation borehole vacuum in published CFD baselines) and stronger connected-water supply rates. The √(1−head/drive) restriction law is retained in both modes as an orifice/Bernoulli teaching form. Calibrated values are transparent literature-range picks — not Warrior Met / Blue Creek field calibration or mine-specific accuracy.</p>
+          <p>Warrior Met Coal Gas’s Blue Creek gob unit is documented in <a href="https://www.gsa.state.al.us/Home/DownloadDocument/Hearing%20Results/2019Feb.pdf#page=7" target="_blank" rel="noopener noreferrer">Alabama’s February 2019 hearing results, Order 2019-09</a>. <a href="https://nepis.epa.gov/Exe/ZyPURL.cgi?Dockey=900O0E00.TXT" target="_blank" rel="noopener noreferrer">EPA’s 1994 report</a> describes Black Warrior Methane’s conventional vertical CBM wells, surface gob wells and in-mine boreholes. These sources provide regional context, not site-specific hydraulic inputs or company endorsement.</p>
+          <p>Narration is AI-generated with HeyGen’s Orson voice and stored with this Site. It follows the timeline, including pause and seek. The browser’s text-to-speech voices are not used. If the recording cannot play, the animation and subtitles continue. Graphics quality adapts to the device; Cinematic prioritizes detail within a device-pixel-ratio ceiling of 2.</p>
+        </details>
+      </section>
+    </footer>
+  </div>
+  <noscript>This simulation requires JavaScript and WebGL. Open this HTML file in a full browser.</noscript>
+  <script>
+    // This remains useful if a graphics dependency fails before the module executes.
+    (() => {
+      const showFailure = message => {
+        if (document.getElementById('app').dataset.ready === 'true') return;
+        document.getElementById('boot-message').textContent = message;
+        document.getElementById('reload').hidden = false;
+      };
+      document.getElementById('reload').addEventListener('click', () => location.reload());
+      window.addEventListener('error', e => {
+        if (e.target && e.target.id === 'simulation') showFailure('The 3D libraries could not load. Check your internet connection and reload in Safari or Chrome.');
+      }, true);
+      window.setTimeout(() => showFailure('The 3D view has not started. Open this website link in Safari or Chrome, check your connection, and reload.'), 20000);
+    })();
+  </script>
+  <script type="module" id="simulation">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ---------- Pure model (extracted): deterministic playback and reversible scrubbing ----------
+import {
+  clamp, smooth, hash, SIM_SECONDS, MODEL, ROOF,
+  faceAt, cavePose, connectionAt, advanceTimeline,
+  gasHeadRestriction, fluidRates, buildFluidTable, sampleFluids, cueAt,
+  TEACHING_DISCLAIMER, SQRT_LAW_FOOTNOTE, inflowModeLabel, formatTeachingTelemetry,
+  PROCESS_MODES, DEFAULT_PROCESS_MODE, resolveProcessParams
+} from '/process-model.js';
+// ---------- End pure model ----------
+
+// ---------- Voice policy: NEVER allow an implicit or novelty fallback ----------
+const VOICE_BLACKLIST = /bad news|bahh|bells|boing|bubbles|cellos|deranged|good news|hysterical|junior|pipe organ|trinoids|whisper|wobble|zarvox|ralph|albert|fred|kathy|princess|victoria/i;
+const VOICE_PRIORITY = ['Samantha', 'Alex', 'Karen', 'Daniel', 'Moira', 'Tessa', 'Siri', 'Google US English', 'Natural', 'Neural'];
+function isAllowedVoice(voice) {
+  return !!voice && /^en(?:[-_]|$)/i.test(voice.lang || '') && !VOICE_BLACKLIST.test(`${voice.name || ''} ${voice.voiceURI || ''}`);
+}
+function voiceRank(voice) {
+  if (!isAllowedVoice(voice)) return -Infinity;
+  const name = voice.name.toLowerCase(), i = VOICE_PRIORITY.findIndex(s => name.includes(s.toLowerCase()));
+  return (i < 0 ? 100 : 1000 - i * 35) + (/enhanced|premium|natural|neural/i.test(name) ? 120 : 0) + (voice.localService ? 12 : 0) + (voice.default ? 1 : 0);
+}
+function safeVoices(voices) { return [...voices].filter(isAllowedVoice).sort((a, b) => voiceRank(b) - voiceRank(a) || a.name.localeCompare(b.name)); }
+// ---------- End voice policy ----------
+
+class Narrator {
+  constructor(select, stateLabel) {
+    this.audio = new Audio(); this.audio.preload = 'auto';
+    this.audio.setAttribute('playsinline', '');
+    this.audio.volume = 1; this.enabled = true; this.stateLabel = stateLabel;
+    this.scenario = ''; this.wantedTime = 0; this.wantedPlaying = false;
+    this.pendingPlay = false; this.blocked = false; this.generation = 0; this.lastCorrection = -10000;
+    select.replaceChildren(new Option('Orson · recorded AI narration', 'orson')); select.disabled = true;
+    this.onMetadata = () => { this.position(true); };
+    this.onWaiting = () => { if (this.enabled && this.wantedPlaying) this.stateLabel.textContent = 'Loading audio · subtitles on'; };
+    this.onError = () => { this.blocked = true; this.stateLabel.textContent = 'Audio unavailable · subtitles on'; };
+    this.onPlaying = () => { if (this.enabled && this.wantedPlaying) { this.position(false); this.stateLabel.textContent = 'Orson · AI narration'; } else this.audio.pause(); };
+    this.audio.addEventListener('loadedmetadata', this.onMetadata);
+    this.audio.addEventListener('waiting', this.onWaiting);
+    this.audio.addEventListener('error', this.onError);
+    this.audio.addEventListener('playing', this.onPlaying);
+    this.sync(0, false, 'seep', true);
+  }
+  position(force) {
+    const now = performance.now();
+    if (force || (now - this.lastCorrection > 900 && Math.abs(this.audio.currentTime - this.wantedTime) > .4)) {
+      try { this.audio.currentTime = this.wantedTime; this.lastCorrection = now; } catch {}
+    }
+  }
+  // A single HTMLMediaElement follows the simulation clock. A blocked decoder
+  // or autoplay promise can never hold up mining, rendering, or scrubbing.
+  sync(t, playing, scenario = this.scenario, force = false) {
+    this.wantedTime = clamp(t, 0, 100) * SIM_SECONDS / 100;
+    this.wantedPlaying = playing;
+    if (scenario !== this.scenario) {
+      this.generation++; this.pendingPlay = false; this.blocked = false;
+      this.audio.pause(); this.scenario = ['dry', 'wet'].includes(scenario) ? scenario : 'seep';
+      this.audio.src = `/audio/narration-${this.scenario}.mp3`; this.audio.load(); force = true;
+    }
+    if (force) this.blocked = false;
+    this.position(force);
+    if (!playing || !this.enabled) {
+      if(this.pendingPlay){this.generation++;this.pendingPlay=false;}
+      this.audio.pause(); return;
+    }
+    if (!this.audio.paused || this.pendingPlay || this.blocked) return;
+    const generation = this.generation; this.pendingPlay = true;
+    // Called directly from Play/unmute/seek gestures, before any awaited work.
+    try {
+      const promise = this.audio.play();
+      Promise.resolve(promise).then(() => {
+        if (generation !== this.generation) return;
+        this.pendingPlay = false;
+        if (!this.wantedPlaying || !this.enabled) this.audio.pause();
+        else this.stateLabel.textContent = 'Orson · AI narration';
+      }).catch(() => {
+        if (generation !== this.generation) return;
+        this.pendingPlay = false; this.blocked = true;
+        this.stateLabel.textContent = 'Tap audio to retry · subtitles on';
+      });
+    } catch { this.pendingPlay = false; this.blocked = true; this.stateLabel.textContent = 'Audio unavailable · subtitles on'; }
+  }
+  cancel() {
+    this.generation++;this.pendingPlay=false;this.wantedPlaying = false; this.audio.pause();
+  }
+  setEnabled(enabled) {
+    this.enabled = enabled; this.blocked = false;
+    if (!enabled) {this.generation++;this.pendingPlay=false;this.audio.pause();}
+    this.stateLabel.textContent = enabled ? 'Orson · AI narration' : 'Audio muted';
+  }
+  dispose() {
+    this.generation++; this.cancel();
+    this.audio.removeEventListener('loadedmetadata', this.onMetadata);
+    this.audio.removeEventListener('waiting', this.onWaiting);
+    this.audio.removeEventListener('error', this.onError);
+    this.audio.removeEventListener('playing', this.onPlaying);
+    this.audio.removeAttribute('src'); this.audio.load();
+  }
+}
+
+// ---------- Procedural rock: no downloaded textures or geometry ----------
+function rockMaterial(kind, renderer) {
+  const palette = { sand: [137, 121, 96], shale: [72, 80, 86], silt: [105, 108, 103], coal: [28, 31, 34] };
+  const base = palette[kind], size = 128;
+  const canvases = Array.from({ length: 3 }, () => Object.assign(document.createElement('canvas'), { width: size, height: size }));
+  const contexts = canvases.map(c => c.getContext('2d'));
+  const images = contexts.map(c => c.createImageData(size, size));
+  for (let y = 0; y < size; y++) {
+    const lamina = Math.sin(y * (kind === 'sand' ? .13 : .39)) * 7 + Math.sin(y * .047) * 9;
+    const bed = hash(Math.floor(y / (kind === 'coal' ? 15 : 9)) + 60) * 14 - 7;
+    for (let x = 0; x < size; x++) {
+      const i = (y * size + x) * 4, grain = (hash(x + y * size) - .5) * 24;
+      const ripple = Math.sin(x * .023 + y * .3) * 2.5;
+      const value = grain + lamina + bed + ripple;
+      for (let c = 0; c < 3; c++) {
+        images[0].data[i + c] = clamp(base[c] + value, 0, 255);
+        images[1].data[i + c] = clamp(128 + value * 2, 0, 255);
+        images[2].data[i + c] = clamp((kind === 'coal' ? 165 : 213) + grain, 0, 255);
+      }
+      for (const img of images) img.data[i + 3] = 255;
+    }
+  }
+  contexts.forEach((c, i) => c.putImageData(images[i], 0, 0));
+  // Bedding breaks and irregular cross-joints continue across the texture.
+  for (let j = 0; j < 35; j++) {
+    const horizontal = j < 23, origin = hash(j + 350) * size;
+    for (let map = 0; map < 3; map++) {
+      const ctx = contexts[map]; ctx.beginPath(); ctx.lineWidth = horizontal ? .5 + hash(j) : 1.1;
+      ctx.strokeStyle = map === 0 ? 'rgba(16,20,23,.40)' : map === 1 ? 'rgba(25,25,25,.65)' : '#eeeeee';
+      for (let step = 0; step <= 12; step++) {
+        const along = step * size / 12, wobble = (hash(j * 73 + step) - .5) * (horizontal ? 3 : 12);
+        const x = horizontal ? along : origin + wobble, y = horizontal ? origin + wobble : along;
+        if (!step) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+  }
+  const textures = canvases.map((canvas, i) => {
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+    texture.colorSpace = i === 0 ? THREE.SRGBColorSpace : THREE.NoColorSpace;
+    texture.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
+    return texture;
+  });
+  const material = new THREE.MeshStandardMaterial({ map: textures[0], bumpMap: textures[1], bumpScale: kind === 'coal' ? .10 : .075, displacementMap: textures[1], displacementScale: .045, displacementBias: -.0225, roughnessMap: textures[2], roughness: 1, metalness: kind === 'coal' ? .08 : 0, vertexColors: true, envMapIntensity: kind === 'coal' ? .8 : .35 });
+  const loader = new THREE.TextureLoader();
+  Promise.all(['color','normal','roughness','height'].map(channel => new Promise(resolve => {
+    loader.load(`/textures/${kind}-${channel}.jpg`, texture => {
+      texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+      texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+      texture.colorSpace = channel === 'color' ? THREE.SRGBColorSpace : THREE.NoColorSpace;
+      resolve(texture);
+    }, undefined, () => resolve(null));
+  }))).then(maps => {
+    if (renderer._gobDisposed || maps.some(map => !map)) { maps.forEach(map => map?.dispose()); return; }
+    textures.forEach(texture => texture.dispose());
+    [material.map, material.normalMap, material.roughnessMap, material.displacementMap] = maps;
+    material.bumpMap = null; material.normalScale.set(.72,.72);
+    material.needsUpdate = true; renderer._gobAssetsChanged = true;
+  });
+  return material;
+}
+
+function bedUV(geometry) {
+  const p = geometry.attributes.position, n = geometry.attributes.normal, uv = geometry.attributes.uv;
+  const colors = new Float32Array(p.count * 3);
+  for (let i = 0; i < p.count; i++) {
+    const top = Math.abs(n.getY(i)) > .7;
+    uv.setXY(i, (p.getX(i) + p.getZ(i) * .23) * .14, top ? p.getZ(i) * .17 : p.getY(i) * .55);
+    const shade = .91 + .09 * Math.sin(p.getX(i)*.4+p.getZ(i)*.6);
+    colors.set([shade,shade,shade],i*3);
+  }
+  geometry.setAttribute('color',new THREE.BufferAttribute(colors,3));
+  return geometry;
+}
+
+// Clip a convex polygon against a Voronoi bisector. Neighboring cells share
+// boundaries, making the intact roof continuous, not a pile of floating cubes.
+function clipCell(poly, nx, nz, limit) {
+  const out = [];
+  for (let i = 0; i < poly.length; i++) {
+    const a = poly[i], b = poly[(i + 1) % poly.length];
+    const da = a[0] * nx + a[1] * nz - limit, db = b[0] * nx + b[1] * nz - limit;
+    if (da <= 0) out.push(a);
+    if ((da <= 0) !== (db <= 0)) { const k = da / (da - db); out.push([a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k]); }
+  }
+  return out;
+}
+
+function fracturedBed(layer, material) {
+  const spec = ROOF[layer], cols = 26, rows = 7, seeds = [];
+  for (let row = 0; row < rows; row++) for (let col = 0; col < cols; col++) {
+    const id = row * cols + col + layer * 131;
+    seeds.push({ x: -18 + (col + .5 + (hash(id) - .5) * .65) * 36 / cols, z: -8 + (row + .5 + (hash(id + 211) - .5) * .62) * 10 / rows, row, col, id });
+  }
+  const positions = [], uvs = [], colors = [], fragments = [];
+  function triangle(a, b, c, side, edge=false) {
+    for (const p of [a, b, c]) {
+      positions.push(...p); uvs.push((p[0] + p[2] * .23) * .14, (side ? p[1] * .55 : p[2] * .17));
+      // Darker joint faces + cool emissive-like bevel catch read as separation planes.
+      let shade = (side ? .58 : .94) + .10 * Math.sin(p[0]*1.3+p[2]*.8+layer*2);
+      if (edge) shade = Math.min(1.18, shade + .26);
+      const cool = edge ? .10 : 0;
+      colors.push(shade, shade + cool * .35, shade + cool);
+    }
+  }
+  for (const seed of seeds) {
+    let poly = [[-18, -8], [18, -8], [18, 2], [-18, 2]];
+    for (const other of seeds) {
+      if (other === seed || Math.abs(other.col - seed.col) > 2 || Math.abs(other.row - seed.row) > 2) continue;
+      poly = clipCell(poly, other.x - seed.x, other.z - seed.z, (other.x ** 2 + other.z ** 2 - seed.x ** 2 - seed.z ** 2) / 2);
+      if (!poly.length) break;
+    }
+    const cx = poly.reduce((s, p) => s + p[0], 0) / poly.length, cz = poly.reduce((s, p) => s + p[1], 0) / poly.length;
+    const cy = spec.bottom + spec.thickness / 2, start = positions.length / 3;
+    // Wider joint aperture + uneven bedding contacts so planes read as face advances.
+    const ring = poly.map(p => [cx + (p[0] - cx) * .985, cz + (p[1] - cz) * .985]);
+    const vertex = (p, top) => [p[0], spec.bottom + (top ? spec.thickness : 0) + Math.sin(p[0] * 1.7 + p[1] * 2.1) * .025, p[1]];
+    // Larger chipped bevel catches light along each broken bedding edge.
+    const bevel = Math.min(.11, spec.thickness*.12);
+    const inner = p => [cx+(p[0]-cx)*.90,cz+(p[1]-cz)*.90];
+    for (let j = 0; j < ring.length; j++) {
+      const a = ring[j], b = ring[(j + 1) % ring.length], a0 = vertex(a, false), a1 = vertex(a, true), b0 = vertex(b, false), b1 = vertex(b, true);
+      const ai = inner(a), bi = inner(b), at = vertex(ai,true), bt = vertex(bi,true), ab = vertex(ai,false), bb = vertex(bi,false);
+      a1[1]-=bevel; b1[1]-=bevel; a0[1]+=bevel; b0[1]+=bevel;
+      triangle([cx, spec.bottom + spec.thickness, cz], bt, at, false);
+      triangle([cx, spec.bottom, cz], ab, bb, false);
+      triangle(at,bt,b1,false,true); triangle(at,b1,a1,false,true);
+      triangle(ab,a0,b0,true); triangle(ab,b0,bb,true);
+      triangle(a0, a1, b1, true); triangle(a0, b1, b0, true);
+    }
+    fragments.push({ start, count: positions.length / 3 - start, x: cx, y: cy, z: cz, seed: seed.id, radius: Math.max(...ring.map(p => Math.hypot(p[0] - cx, p[1] - cz))) });
+  }
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3).setUsage(THREE.DynamicDrawUsage));
+  geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2)); geometry.computeVertexNormals();
+  geometry.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));
+  geometry.attributes.normal.setUsage(THREE.DynamicDrawUsage);
+  const base = new Float32Array(geometry.attributes.position.array), normals = new Float32Array(geometry.attributes.normal.array);
+  for (const f of fragments) for (let i = f.start; i < f.start + f.count; i++) { base[i * 3] -= f.x; base[i * 3 + 1] -= f.y; base[i * 3 + 2] -= f.z; }
+  const mesh = new THREE.Mesh(geometry, material); mesh.castShadow = mesh.receiveShadow = true;
+  mesh.frustumCulled = false; // Bounds change as the roof caves; never pop out of view.
+  const q = new THREE.Quaternion(), e = new THREE.Euler(), v = new THREE.Vector3(), n = new THREE.Vector3();
+  return { mesh, update(t) {
+    const p = geometry.attributes.position.array, ns = geometry.attributes.normal.array;
+    for (const f of fragments) {
+      const pose = cavePose(t, f.x, layer, f.seed);
+      e.set(pose.tilt * .48, pose.tilt * .25, pose.tilt); q.setFromEuler(e);
+      const y = Math.max(f.y - pose.drop - pose.settle, spec.thickness / 2 + Math.abs(pose.tilt) * f.radius + .025);
+      for (let i = f.start * 3, end = (f.start + f.count) * 3; i < end; i += 3) {
+        v.set(base[i], base[i + 1], base[i + 2]).applyQuaternion(q);
+        p[i] = v.x + f.x + pose.tilt * .13; p[i + 1] = v.y + y; p[i + 2] = v.z + f.z;
+        n.set(normals[i], normals[i + 1], normals[i + 2]).applyQuaternion(q); ns[i] = n.x; ns[i + 1] = n.y; ns[i + 2] = n.z;
+      }
+    }
+    geometry.attributes.position.needsUpdate = geometry.attributes.normal.needsUpdate = true;
+  } };
+}
+
+function bendingBed(bottom, thickness, index, material) {
+  const geometry = bedUV(new THREE.BoxGeometry(36, thickness, 10, 64, 1, 4));
+  geometry.translate(0, bottom + thickness / 2, -3);
+  const base = new Float32Array(geometry.attributes.position.array), mesh = new THREE.Mesh(geometry, material);
+  mesh.castShadow = mesh.receiveShadow = true; mesh.frustumCulled = false;
+  return { mesh, update(t) {
+    const p = geometry.attributes.position.array, face = faceAt(t);
+    for (let i = 0; i < p.length; i += 3) {
+      const behind = face - base[i], bend = smooth(3 + index * .8, 16 + index * 2, behind);
+      const amplitude = .88 - index * .13;
+      // Stronger bed separation as face advances — teaching plane visibility, not CFD.
+      const separation = Math.sin(clamp((behind - 3.2) / 22) * Math.PI) * (.045 + .12 * index);
+      p[i] = base[i] - bend * (.11 + index * .045); p[i + 1] = base[i + 1] - bend * amplitude + separation; p[i + 2] = base[i + 2];
+    }
+    geometry.attributes.position.needsUpdate = true; geometry.computeVertexNormals();
+  } };
+}
+
+// Real openings in a cut-away casing wall, including its inner steel surface.
+function casingGeometry(radius, bottom, top) {
+  const p = [], uv = [], sides = 54, rows = 94, thickness = .035;
+  function quad(a, b, c, d) { for (const v of [a, b, d, b, c, d]) { p.push(...v); uv.push(v[0], v[1]); } }
+  const point = (r, angle, y) => [Math.sin(angle) * r, y, Math.cos(angle) * r];
+  for (let y = 0; y < rows; y++) for (let i = 0; i < sides; i++) {
+    const y0 = bottom + (top - bottom) * y / rows, y1 = bottom + (top - bottom) * (y + 1) / rows;
+    const a0 = Math.PI / 3 + i / sides * Math.PI * 4 / 3, a1 = Math.PI / 3 + (i + 1) / sides * Math.PI * 4 / 3;
+    const slotted = y0 > bottom + .7 && y1 < bottom + 4.4 && y % 5 < 3 && i % 9 >= 3 && i % 9 <= 4;
+    if (slotted) continue;
+    quad(point(radius, a0, y0), point(radius, a1, y0), point(radius, a1, y1), point(radius, a0, y1));
+    quad(point(radius - thickness, a1, y0), point(radius - thickness, a0, y0), point(radius - thickness, a0, y1), point(radius - thickness, a1, y1));
+    if (i === 0 || i === sides - 1) {
+      const a = i === 0 ? a0 : a1;
+      quad(point(radius, a, y0), point(radius, a, y1), point(radius - thickness, a, y1), point(radius - thickness, a, y0));
+    }
+  }
+  const geometry = new THREE.BufferGeometry(); geometry.setAttribute('position', new THREE.Float32BufferAttribute(p, 3)); geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); geometry.computeVertexNormals(); return geometry;
+}
+
+// One lightweight film pass: highlight diffusion, restrained grading and lens
+// falloff. No multipass depth-of-field or blur that hides the engineering view.
+class FilmPass {
+  constructor(renderer) {
+    this.renderer = renderer;
+    const type = renderer.extensions.has('EXT_color_buffer_float') ? THREE.HalfFloatType : THREE.UnsignedByteType;
+    this.target = new THREE.WebGLRenderTarget(1,1,{type,depthBuffer:true});
+    this.target.texture.colorSpace = THREE.LinearSRGBColorSpace;
+    this.uniforms = { image:{value:this.target.texture}, texel:{value:new THREE.Vector2(1,1)}, strength:{value:.065} };
+    this.material = new THREE.ShaderMaterial({ uniforms:this.uniforms, depthTest:false, depthWrite:false,
+      vertexShader:`varying vec2 vUv; void main(){ vUv=uv; gl_Position=vec4(position.xy,0.,1.); }`,
+      fragmentShader:`uniform sampler2D image; uniform vec2 texel; uniform float strength; varying vec2 vUv;
+        vec3 highlights(vec2 uv){vec3 c=texture2D(image,uv).rgb;return max(c-vec3(.82),vec3(0.));}
+        void main(){
+          vec3 c=texture2D(image,vUv).rgb;
+          vec2 r=texel*3.5;
+          vec3 glow=highlights(vUv+vec2(r.x,0.))+highlights(vUv-vec2(r.x,0.));
+          glow+=highlights(vUv+vec2(0.,r.y))+highlights(vUv-vec2(0.,r.y));
+          glow+=highlights(vUv+r*2.)+highlights(vUv-r*2.);
+          c+=glow*(strength/6.);
+          c*=vec3(1.025,1.01,.985);
+          float lens=dot((vUv-.5)*vec2(1.,.88),(vUv-.5)*vec2(1.,.88));
+          c*=1.-smoothstep(.08,.49,lens)*.23;
+          gl_FragColor=vec4(c,1.);
+          #include <tonemapping_fragment>
+          #include <colorspace_fragment>
+        }` });
+    this.scene = new THREE.Scene(); this.camera = new THREE.OrthographicCamera(-1,1,1,-1,0,1);
+    this.quad = new THREE.Mesh(new THREE.PlaneGeometry(2,2),this.material); this.quad.frustumCulled=false; this.scene.add(this.quad);
+  }
+  resize(width,height){ this.target.setSize(width,height); this.uniforms.texel.value.set(1/width,1/height); }
+  render(scene,camera){ const r=this.renderer; r.setRenderTarget(this.target); r.render(scene,camera); r.setRenderTarget(null); r.render(this.scene,this.camera); }
+  dispose(){ this.target.dispose(); this.quad.geometry.dispose(); this.material.dispose(); }
+}
+
+function glowTexture() {
+  const c=Object.assign(document.createElement('canvas'),{width:64,height:64}),ctx=c.getContext('2d');
+  const g=ctx.createRadialGradient(32,32,0,32,32,32);g.addColorStop(0,'rgba(255,244,215,1)');g.addColorStop(.12,'rgba(255,222,170,.65)');g.addColorStop(.35,'rgba(218,193,157,.14)');g.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.fillStyle=g;ctx.fillRect(0,0,64,64);const texture=new THREE.CanvasTexture(c);texture.colorSpace=THREE.SRGBColorSpace;return texture;
+}
+
+class Cutaway {
+  constructor(canvas, stage) {
+    this.canvas = canvas; this.stage = stage; this.dirty = true; this.time = 0;
+    this.quality='auto'; this.resolutionScale=1; this.viewMode='cinema'; this.progress=0; this.lastShadow=-1; this.lastRock=-1;
+    this.cameraBlend=1; this.cameraTarget=new THREE.Vector3(); this.cameraPosition=new THREE.Vector3();
+    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'default' });
+    this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+    this.renderer.toneMapping = THREE.ACESFilmicToneMapping; this.renderer.toneMappingExposure = 1.0;
+    this.renderer.shadowMap.enabled = true; this.renderer.shadowMap.type = THREE.PCFSoftShadowMap; this.renderer.shadowMap.autoUpdate = false;
+    this.scene = new THREE.Scene();
+    this.scene.background = new THREE.Color(0x0c1822);
+    this.scene.fog = new THREE.FogExp2(0x0a141c, .0072);
+    this.camera = new THREE.PerspectiveCamera(36, 1, .08, 260);
+    this.controls = new OrbitControls(this.camera, canvas);
+    this.controls.enableDamping = true; this.controls.dampingFactor = .09; this.controls.enablePan = false;
+    this.controls.minDistance = 8; this.controls.maxDistance = 135;
+    this.controls.minPolarAngle = .15; this.controls.maxPolarAngle = Math.PI * .51;
+    this.controls.addEventListener('change', () => { this.dirty = true; });
+    this.controls.addEventListener('start',()=>{ this.viewMode='free'; this.cameraBlend=0; this.onViewChange?.('free'); });
+    this.scene.add(new THREE.HemisphereLight(0x9bb8d0, 0x161210, .78));
+    const key = new THREE.DirectionalLight(0xffd5a0, 3.4); key.position.set(-17, 22, 16);
+    this.keyLight=key;
+    key.castShadow = true; key.shadow.mapSize.set(1536, 1536); key.shadow.camera.left = -27; key.shadow.camera.right = 27;
+    key.shadow.camera.top = 24; key.shadow.camera.bottom = -20; key.shadow.camera.near = 1; key.shadow.camera.far = 85;
+    key.shadow.normalBias = .035; key.shadow.bias = -.00010; key.shadow.radius = 4.5; this.scene.add(key);
+    const fill = new THREE.DirectionalLight(0x7aa8d8, 1.48); fill.position.set(16, 10, -14); this.scene.add(fill);
+    const rim = new THREE.DirectionalLight(0xb4d4ea, 2.15); rim.position.set(1, 15, -10); this.scene.add(rim);
+    const soft = new THREE.DirectionalLight(0xc8d6df,.55);soft.position.set(0,6,26);this.scene.add(soft);
+    this.makeEnvironment(); this.glowMap=glowTexture();
+    this.materials = Object.fromEntries(['sand', 'shale', 'silt', 'coal'].map(k => [k, rockMaterial(k, this.renderer)]));
+    this.steel = new THREE.MeshStandardMaterial({ color: 0xa1adb5, metalness: .88, roughness: .27, side: THREE.DoubleSide, envMapIntensity:1.1 });
+    this.darkSteel = new THREE.MeshStandardMaterial({ color: 0x35424a, metalness: .78, roughness: .4, envMapIntensity:.8 });
+    this.brass = new THREE.MeshStandardMaterial({ color: 0x9c8252, metalness: .55, roughness: .46 });
+    this.paint = new THREE.MeshStandardMaterial({ color: 0x94703f, metalness: .3, roughness: .62 });
+    this.buildRock(); this.buildMachinery(); this.buildWell(); this.buildFlows();
+    this.film = new FilmPass(this.renderer);
+    this.resize(true);
+  }
+  makeEnvironment() {
+    const c=Object.assign(document.createElement('canvas'),{width:512,height:256}),ctx=c.getContext('2d');
+    const g=ctx.createLinearGradient(0,0,0,256);
+    g.addColorStop(0,'#6b889f');g.addColorStop(.42,'#273946');g.addColorStop(.54,'#172129');g.addColorStop(1,'#070a0e');ctx.fillStyle=g;ctx.fillRect(0,0,512,256);
+    for(const [x,y,w,h,color] of [[110,48,38,45,'#e6c798'],[350,72,65,23,'#9bbad2'],[230,115,9,30,'#fff1d5']]){
+      ctx.fillStyle=color;ctx.fillRect(x,y,w,h);
+    }
+    const texture=new THREE.CanvasTexture(c);texture.mapping=THREE.EquirectangularReflectionMapping;texture.colorSpace=THREE.SRGBColorSpace;
+    const pmrem=new THREE.PMREMGenerator(this.renderer);this.environment=pmrem.fromEquirectangular(texture);
+    this.scene.environment=this.environment.texture;this.scene.environmentIntensity=.55;texture.dispose();pmrem.dispose();
+  }
+  lamp(parent,x,y,z,size=1) {
+    const material=new THREE.SpriteMaterial({map:this.glowMap,color:0xffd39a,transparent:true,opacity:.38,depthWrite:false,blending:THREE.AdditiveBlending});
+    const sprite=new THREE.Sprite(material);sprite.position.set(x,y,z);sprite.scale.setScalar(size);parent.add(sprite);return sprite;
+  }
+  makeContactBlob(size,x,y,z,opacity=.85) {
+    // DataTexture radial falloff — no DOM canvas (keeps Node cutaway tests green).
+    const res=64, data=new Uint8Array(res*res*4), cx=(res-1)*.5, maxR=res*.5;
+    for(let yy=0;yy<res;yy++) for(let xx=0;xx<res;xx++){
+      const d=Math.hypot(xx-cx,yy-cx)/maxR, a=Math.max(0,1-d), soft=a*a*.55;
+      const i=(yy*res+xx)*4; data[i]=data[i+1]=data[i+2]=0; data[i+3]=Math.round(soft*255);
+    }
+    const tex=new THREE.DataTexture(data,res,res,THREE.RGBAFormat); tex.needsUpdate=true;
+    const mat=new THREE.MeshBasicMaterial({map:tex,transparent:true,opacity,depthWrite:false});
+    const mesh=new THREE.Mesh(new THREE.PlaneGeometry(size,size),mat);
+    mesh.rotation.x=-Math.PI/2;mesh.position.set(x,y,z);mesh.renderOrder=1;mesh.frustumCulled=false;
+    return mesh;
+  }
+  box(width, height, depth, material, x, y, z, parent = this.scene) {
+    const mesh = new THREE.Mesh(new THREE.BoxGeometry(width, height, depth), material);
+    mesh.position.set(x, y, z); mesh.castShadow = mesh.receiveShadow = true; parent.add(mesh); return mesh;
+  }
+  pipe(a, b, radius, material, parent = this.scene) {
+    const start = new THREE.Vector3(...a), end = new THREE.Vector3(...b), direction = end.clone().sub(start);
+    const mesh = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, direction.length(), 16), material);
+    mesh.position.copy(start).add(end).multiplyScalar(.5); mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction.normalize());
+    mesh.castShadow = true; parent.add(mesh); return mesh;
+  }
+  buildRock() {
+    const floor = new THREE.Mesh(bedUV(new THREE.BoxGeometry(38, .85, 12, 36, 3, 8)), this.materials.sand);
+    floor.position.set(0, -.45, -3); floor.receiveShadow = true; this.scene.add(floor);
+    const plinth = this.box(38.3, .18, 12.3, new THREE.MeshStandardMaterial({ color: 0x0a1118, roughness: .9 }), 0, -.96, -3); plinth.castShadow = false;
+    const ground=new THREE.Mesh(new THREE.PlaneGeometry(200,200),new THREE.MeshStandardMaterial({color:0x0b131c,roughness:.86,metalness:.12}));
+    ground.rotation.x=-Math.PI/2;ground.position.y=-1.07;ground.receiveShadow=true;this.scene.add(ground);
+    this.coal = new THREE.Mesh(bedUV(new THREE.BoxGeometry(36, 2.3, 10, 64, 6, 8)), this.materials.coal);
+    this.coal.position.set(0, 1.15, -3); this.coal.castShadow = this.coal.receiveShadow = true; this.scene.add(this.coal);
+    this.roof = ROOF.map((spec, i) => fracturedBed(i, this.materials[spec.type]));
+    this.roof.forEach(bed => this.scene.add(bed.mesh));
+    this.mainRoof = []; let bottom = 6.015;
+    for (const [i, thickness] of [1.1, .8, 1.18, .76].entries()) {
+      const bed = bendingBed(bottom, thickness, i, this.materials[i % 2 ? 'silt' : 'sand']);
+      this.mainRoof.push(bed); this.scene.add(bed.mesh); bottom += thickness + .055;
+    }
+    // Fine coal chips in the gob floor; one instanced draw call.
+    const chips = new THREE.InstancedMesh(bedUV(new THREE.DodecahedronGeometry(.12, 0)), this.materials.coal, 95);
+    const dummy = new THREE.Object3D(); this.chipPositions = [];
+    for (let i = 0; i < 95; i++) {
+      const x = -17.8 + hash(i + 893) * 35.6, z = -7.8 + hash(i + 182) * 9.6;
+      this.chipPositions.push(x); dummy.position.set(x, .11, z); dummy.rotation.set(hash(i), hash(i + 1), hash(i + 2)); dummy.scale.set(1 + hash(i) * 2, .6, 1.4); dummy.updateMatrix(); chips.setMatrixAt(i, dummy.matrix);
+    }
+    chips.castShadow = true; this.scene.add(chips);
+    // Secondary angular splinters fill the broken roof with several scales of
+    // rubble. Instancing keeps hundreds of fragments in one draw call.
+    // Count raised modestly for denser cave-in; instance tint mixes shale / coal.
+    const rubbleCount=720;
+    const rubbleGeometry=bedUV(new THREE.IcosahedronGeometry(1,0));
+    this.rubble = new THREE.InstancedMesh(rubbleGeometry,this.materials.shale,rubbleCount);
+    this.rubble.instanceMatrix.setUsage(THREE.DynamicDrawUsage);this.rubble.frustumCulled=false;
+    this.rubble.castShadow=this.rubble.receiveShadow=true;this.rubbleLocations=[];
+    const shaleTint=new THREE.Color(0x6e7880), coalTint=new THREE.Color(0x2a2e32);
+    for(let i=0;i<rubbleCount;i++){
+      this.rubbleLocations.push({x:-17.8+hash(i+1250)*35.6,z:-7.8+hash(i+710)*9.6,s:.09+hash(i+901)*.31,y:.10+hash(i+715)*.32});
+      const mix=hash(i+331)>.68? .55+hash(i+448)*.4 : hash(i+448)*.35;
+      this.rubble.setColorAt(i,shaleTint.clone().lerp(coalTint,mix).multiplyScalar(.72+hash(i+512)*.38));
+    }
+    if(this.rubble.instanceColor) this.rubble.instanceColor.needsUpdate=true;
+    this.scene.add(this.rubble);
+    // Cheap contact darkening under gob rubble (radial soft blob — no SSAO).
+    this.scene.add(this.makeContactBlob(44, 0, -.985, -3, .9));
+    // Simple scale reference, with tick marks: each long tick is 5 model metres.
+    const points = [];
+    for (let i = 0; i <= 10; i++) { const x = -17.5 + i; points.push(x, -.7, 3.07, x, i % 5 === 0 ? -.33 : -.48, 3.07); }
+    points.push(-17.5, -.68, 3.07, -7.5, -.68, 3.07);
+    const ruler = new THREE.LineSegments(new THREE.BufferGeometry().setAttribute('position', new THREE.Float32BufferAttribute(points, 3)), new THREE.LineBasicMaterial({ color: 0x9eb0b9, transparent: true, opacity: .55 })); this.scene.add(ruler);
+  }
+  buildMachinery() {
+    this.machine = new THREE.Group(); this.scene.add(this.machine);
+    for (let i = 0; i < 6; i++) {
+      const z = -7.15 + i * 1.49;
+      this.box(2.45, .15, 1.37, this.darkSteel, -1.92, .15, z, this.machine);
+      const canopy = this.box(2.9, .15, 1.42, this.paint, -1.65, 2.08, z, this.machine); canopy.rotation.z = -.035;
+      for (const side of [-.42, .42]) {
+        this.pipe([-2.2, .25, z + side], [-1.88, 1.36, z + side], .115, this.darkSteel, this.machine);
+        this.pipe([-1.88, 1.2, z + side], [-1.7, 1.97, z + side], .068, this.steel, this.machine);
+      }
+      const rear = this.box(.14, 1.48, 1.3, this.darkSteel, -2.95, 1.05, z, this.machine); rear.rotation.z = -.23;
+      // Pin joints, canopy wear rails and hydraulic hoses give the shields a
+      // readable mechanical silhouette at the close camera distance.
+      this.box(2.65,.045,.055,this.steel,-1.72,2.177,z-.61,this.machine);
+      this.box(2.65,.045,.055,this.steel,-1.72,2.177,z+.61,this.machine);
+      for(const x of [-2.85,-1.08]) this.pipe([x,1.99,z-.74],[x,1.99,z+.74],.055,this.steel,this.machine);
+      const hose=new THREE.CatmullRomCurve3([new THREE.Vector3(-2.7,.4,z+.4),new THREE.Vector3(-2.9,.9,z+.4),new THREE.Vector3(-2.45,1.45,z+.4),new THREE.Vector3(-1.7,1.72,z+.4)]);
+      this.machine.add(new THREE.Mesh(new THREE.TubeGeometry(hose,10,.028,5,false),this.darkSteel));
+    }
+    this.box(.55, .24, 9.7, this.darkSteel, -.3, .22, -3, this.machine);
+    this.pipe([-.48,.39,-7.8],[-.48,.39,1.8],.035,this.steel,this.machine);
+    this.pipe([-.08,.39,-7.8],[-.08,.39,1.8],.035,this.steel,this.machine);
+    this.shearer = new THREE.Group(); this.machine.add(this.shearer);
+    this.box(.55, .43, 2.5, this.paint, -.25, .65, 0, this.shearer);
+    this.drums = [];
+    for (const z of [-1.52, 1.52]) {
+      this.pipe([-.25, .78, z * .58], [.03, 1.0, z], .10, this.paint, this.shearer);
+      const drum = new THREE.Mesh(new THREE.CylinderGeometry(.53, .53, .56, 20), this.darkSteel);
+      drum.rotation.x = Math.PI / 2; drum.position.set(.05, 1.01, z); drum.castShadow = true; this.shearer.add(drum); this.drums.push(drum);
+      for (let j = 0; j < 12; j++) {
+        const tooth = new THREE.Mesh(new THREE.ConeGeometry(.065, .16, 4), this.steel); const a = j * Math.PI / 6;
+        tooth.position.set(Math.sin(a) * .54, (j % 3 - 1) * .16, Math.cos(a) * .54); tooth.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), new THREE.Vector3(Math.sin(a), 0, Math.cos(a))); drum.add(tooth);
+      }
+    }
+    const lampMaterial = new THREE.MeshStandardMaterial({ color: 0xffe3b4, emissive: 0xffb957, emissiveIntensity: 2 });
+    this.box(.12, .09, .25, lampMaterial, -.55, 1.1, .5, this.shearer);
+    this.lamp(this.shearer,-.56,1.1,.66,1.2);
+    this.workLight = new THREE.PointLight(0xffbd75, 55, 13, 2); this.workLight.position.set(-1.2, 1.35, 2.1); this.machine.add(this.workLight);
+    this.lamp(this.machine,-1.2,1.6,1.7,1.5);
+    const backLamp = new THREE.PointLight(0xffd5a0, 19, 10, 2); backLamp.position.set(-1.2, 1.55, -6); this.machine.add(backLamp);
+  }
+  buildWell() {
+    this.well = new THREE.Group(); this.well.position.z = 2.28; this.scene.add(this.well);
+    this.wellBottom = 3.1; this.wellTop = 14.4; this.waterRadius = .28;
+    const casing = new THREE.Mesh(casingGeometry(.355, this.wellBottom, this.wellTop), this.steel); casing.castShadow = true; this.well.add(casing);
+    for (const y of [3.15, 7.62, 10.12, 12.4, 14.3]) {
+      const collar = new THREE.Mesh(new THREE.CylinderGeometry(.402, .402, .13, 40, 1, true, Math.PI / 3, Math.PI * 4 / 3), this.darkSteel);
+      collar.position.y = y; this.well.add(collar);
+    }
+    const cap = new THREE.Mesh(new THREE.CylinderGeometry(.32, .32, .1, 32), this.darkSteel); cap.position.y = this.wellBottom; this.well.add(cap);
+    // Wellhead is shown above the cut interval; intervening overburden omitted.
+    this.pipe([0, 14.35, 0], [0, 15.05, 0], .28, this.steel, this.well);
+    this.pipe([0, 14.7, 0], [2.4, 14.7, 0], .18, this.steel, this.well);
+    for (const y of [14.45, 14.98]) {
+      const flange = new THREE.Mesh(new THREE.CylinderGeometry(.49, .49, .13, 24), this.darkSteel); flange.position.y = y; this.well.add(flange);
+      for (let j = 0; j < 8; j++) { const a = j * Math.PI / 4; this.pipe([Math.sin(a) * .39, y - .1, Math.cos(a) * .39], [Math.sin(a) * .39, y + .1, Math.cos(a) * .39], .035, this.steel, this.well); }
+    }
+    this.box(.64, .5, .55, this.darkSteel, 1.15, 14.7, 0, this.well);
+    this.pipe([1.15, 14.92, 0], [1.15, 15.35, 0], .055, this.brass, this.well);
+    const wheel = new THREE.Mesh(new THREE.TorusGeometry(.36, .04, 8, 24), this.paint); wheel.rotation.x = Math.PI / 2; wheel.position.set(1.15, 15.35, 0); this.well.add(wheel);
+    this.pipe([.8, 15.35, 0], [1.5, 15.35, 0], .025, this.paint, this.well);
+    this.pipe([1.15, 15.35, -.35], [1.15, 15.35, .35], .025, this.paint, this.well);
+    this.pipe([.32, 14.7, 0], [.32, 15.2, 0], .035, this.brass, this.well);
+    const gauge = new THREE.Mesh(new THREE.CylinderGeometry(.16, .16, .08, 24), this.steel); gauge.rotation.x = Math.PI / 2; gauge.position.set(.32, 15.21, .03); this.well.add(gauge);
+    this.pipe([.32, 15.21, .078], [.38, 15.28, .078], .012, this.darkSteel, this.well);
+    const waterMaterial = new THREE.MeshPhysicalMaterial({ color: 0x3a7a8e, metalness: .06, roughness: .08, transparent: true, opacity: .70, clearcoat: 1, clearcoatRoughness: .055, envMapIntensity:1.25, depthWrite: false, side:THREE.DoubleSide });
+    this.water = new THREE.Mesh(new THREE.CylinderGeometry(this.waterRadius, this.waterRadius, 1, 32, 1, true), waterMaterial); this.water.renderOrder = 3; this.well.add(this.water);
+    // Concentric triangles let the water surface ripple, not just bob as a disk.
+    const pos = [], indices = [], radial = 8, angular = 40;
+    for (let r = 0; r <= radial; r++) for (let a = 0; a <= angular; a++) { const angle = a / angular * Math.PI * 2; pos.push(Math.cos(angle) * r / radial * this.waterRadius, 0, Math.sin(angle) * r / radial * this.waterRadius); }
+    for (let r = 0; r < radial; r++) for (let a = 0; a < angular; a++) { const k = r * (angular + 1) + a; indices.push(k, k + 1, k + angular + 1, k + 1, k + angular + 2, k + angular + 1); }
+    const surface = new THREE.BufferGeometry(); surface.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3).setUsage(THREE.DynamicDrawUsage)); surface.setIndex(indices); surface.computeVertexNormals();
+    this.waterSurface = new THREE.Mesh(surface, new THREE.MeshPhysicalMaterial({ color: 0x9ac8d6, metalness: .10, roughness: .06, side: THREE.DoubleSide, transparent: true, opacity: .93, clearcoat: 1, clearcoatRoughness: .04, envMapIntensity:1.55 })); this.waterSurface.renderOrder = 4; this.well.add(this.waterSurface);
+    this.meniscus=new THREE.Mesh(new THREE.TorusGeometry(this.waterRadius*.985,.012,6,48),new THREE.MeshBasicMaterial({color:0xc0e6ef,transparent:true,opacity:.82}));
+    this.meniscus.rotation.x=Math.PI/2;this.meniscus.renderOrder=5;this.well.add(this.meniscus);
+    const dropletsMaterial = new THREE.MeshStandardMaterial({ color: 0x9bb8c4, roughness: .18, transparent: true, opacity: .75 });
+    this.drops = new THREE.InstancedMesh(new THREE.SphereGeometry(.032, 6, 4), dropletsMaterial, 22); this.drops.instanceMatrix.setUsage(THREE.DynamicDrawUsage); this.drops.frustumCulled = false; this.scene.add(this.drops);
+    this.bubbles = new THREE.InstancedMesh(new THREE.SphereGeometry(.026, 6, 4), new THREE.MeshBasicMaterial({ color: 0xa4c2ce, transparent: true, opacity: .48 }), 14); this.bubbles.instanceMatrix.setUsage(THREE.DynamicDrawUsage); this.bubbles.frustumCulled = false; this.well.add(this.bubbles);
+    this.dummy = new THREE.Object3D();
+    this.waterRoute = new THREE.CatmullRomCurve3([new THREE.Vector3(5.8, 7.7, 2.08), new THREE.Vector3(3, 7.36, 2.10), new THREE.Vector3(1, 6.75, 2.23), new THREE.Vector3(.18, 6.1, 2.35)]);
+    const seepLine = new THREE.Line(new THREE.BufferGeometry().setFromPoints(this.waterRoute.getPoints(40)), new THREE.LineBasicMaterial({ color: 0x6d96a8, transparent: true, opacity: .25 })); this.seepLine = seepLine; this.scene.add(seepLine);
+    // Soft contact darkening under the well casing base.
+    this.scene.add(this.makeContactBlob(3.6, 0, -.975, 2.32, .95));
+  }
+  buildFlows() {
+    this.flowPaths = []; const guides = [], segments = 6, count = 20;
+    this.flowSegments = segments; this.flowCount = count;
+    const intakeY = this.wellBottom + MODEL.intakeHeight;
+    for (let i = 0; i < count; i++) {
+      const sign = i % 2 ? 1 : -1, y = 5.6 + hash(i + 81) * 3.2, x = sign * (5.2 + hash(i + 91) * 7);
+      // Tighter funnel into the slotted inlet so trails converge instead of soup.
+      const curve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(x, y, 2.11), new THREE.Vector3(x * .55, y - .18, 2.14),
+        new THREE.Vector3(x * .20, y - .58, 2.19), new THREE.Vector3(sign * .18, intakeY + .32, 2.27),
+        new THREE.Vector3(sign * .10, intakeY + .06, 2.31), new THREE.Vector3(sign * .08, intakeY + .85, 2.33),
+        new THREE.Vector3(sign * .08, 10.4, 2.34), new THREE.Vector3(0, 14.7, 2.32),
+        new THREE.Vector3(2.75, 14.7, 2.28)
+      ], false, 'centripetal');
+      const path = curve.getSpacedPoints(120); this.flowPaths.push(path);
+      // Fewer static guides — conceptual streamlines, not a neon cage.
+      if (i % 4 === 0) for (let p = 0; p < path.length - 1; p++) guides.push(...path[p].toArray(), ...path[p + 1].toArray());
+    }
+    this.guideMaterial = new THREE.LineBasicMaterial({ color: 0xd4e0d6, transparent: true, opacity: .10, depthWrite: false });
+    this.guides = new THREE.LineSegments(new THREE.BufferGeometry().setAttribute('position', new THREE.Float32BufferAttribute(guides, 3)), this.guideMaterial); this.scene.add(this.guides);
+    const positions = new Float32Array(count * segments * 6), colors = new Float32Array(positions.length), tint = new THREE.Color(0xe6f2ea);
+    for (let i = 0; i < count; i++) for (let j = 0; j < segments; j++) for (let vertex = 0; vertex < 2; vertex++) {
+      const n = ((i * segments + j) * 2 + vertex) * 3, gain = .10 + .90 * Math.pow((j + vertex) / segments, 1.35);
+      colors[n] = tint.r * gain; colors[n + 1] = tint.g * gain; colors[n + 2] = tint.b * gain;
+    }
+    const geometry = new THREE.BufferGeometry(); geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3).setUsage(THREE.DynamicDrawUsage)); geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    this.flowMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, vertexColors: true, transparent: true, opacity: .82, depthWrite: false });
+    this.flows = new THREE.LineSegments(geometry, this.flowMaterial); this.flows.frustumCulled = false; this.flows.renderOrder = 2; this.scene.add(this.flows);
+    const dustPositions = new Float32Array(120 * 3);
+    this.dust = new THREE.Points(new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(dustPositions, 3).setUsage(THREE.DynamicDrawUsage)), new THREE.PointsMaterial({ map:this.glowMap, color: 0xc7b49a, size: .16, transparent: true, opacity: .18, depthWrite: false })); this.dust.frustumCulled = false; this.scene.add(this.dust);
+  }
+  resize(home = false) {
+    const width = Math.max(1, this.stage.clientWidth), height = Math.max(1, this.stage.clientHeight);
+    const budget=this.quality==='cinematic'?8294400:this.quality==='smooth'?1500000:3400000;
+    this.pixelRatio = Math.min(window.devicePixelRatio || 1, 2, Math.sqrt(budget/(width*height))) * this.resolutionScale;
+    this.renderer.setPixelRatio(this.pixelRatio); this.renderer.setSize(width, height, false);
+    this.film?.resize(Math.max(1,Math.floor(width*this.pixelRatio)),Math.max(1,Math.floor(height*this.pixelRatio)));
+    this.camera.aspect = width / height; this.camera.updateProjectionMatrix(); this.dirty = true;
+    if(home) this.updateCamera(1,0,true);
+    else if(this.viewMode!=='free') this.updateCamera(1,this.progress,true);
+    this.renderer.shadowMap.needsUpdate=true;
+  }
+  home() {
+    this.viewMode='free';this.cameraBlend=0;this.onViewChange?.('free');
+    const target = new THREE.Vector3(0, 5.8, -1.6), direction = new THREE.Vector3(.44, .30, 1).normalize();
+    const vertical = THREE.MathUtils.degToRad(this.camera.fov) / 2;
+    const horizontal = Math.atan(Math.tan(vertical) * this.camera.aspect);
+    const distance = Math.max(13.2 / Math.tan(vertical), 20 / Math.tan(horizontal)) + 8;
+    this.controls.target.copy(target); this.camera.position.copy(target).addScaledVector(direction, Math.min(128, distance)); this.controls.update(); this.dirty = true;
+  }
+  setView(mode) { this.viewMode=mode; this.cameraBlend=1; this.onViewChange?.(mode); this.dirty=true; }
+  updateCamera(dt,t,immediate=false) {
+    if(this.viewMode==='free') return;
+    const portrait = clamp(1.1/this.camera.aspect,1,1.36);
+    let target, direction, distance;
+    if(this.viewMode==='well') {
+      target=[0,7,2.25];direction=[.16,.12,1];distance=17*portrait;
+    } else {
+      const shots=[
+        {t:0,p:[-4,5.6,-1.5],d:[.37,.28,1],r:43},
+        {t:14,p:[-14,3.25,-1],d:[.35,.18,1],r:24},
+        {t:35,p:[-4,3.7,-.6],d:[.30,.22,1],r:24},
+        {t:52,p:[.2,4.8,1],d:[.21,.18,1],r:27},
+        // Alfred-synced water beats: gas→inlet (t≈67), pool/meniscus (t≈82).
+        {t:67,p:[0,5.55,2.15],d:[.09,.10,1],r:16.2},
+        {t:82,p:[0,4.92,2.36],d:[.07,.09,1],r:10.2},
+        {t:100,p:[0,6.2,1.5],d:[.32,.22,1],r:31}
+      ];
+      const index=Math.max(0,shots.findIndex((s,i)=>i<shots.length-1 && t>=s.t && t<=shots[i+1].t));
+      const a=shots[index],b=shots[index+1],k=smooth(a.t,b.t,t);
+      target=a.p.map((v,i)=>THREE.MathUtils.lerp(v,b.p[i],k));direction=a.d.map((v,i)=>THREE.MathUtils.lerp(v,b.d[i],k));distance=THREE.MathUtils.lerp(a.r,b.r,k)*portrait;
+    }
+    this.cameraTarget.set(...target);this.cameraPosition.set(...direction).normalize().multiplyScalar(distance).add(this.cameraTarget);
+    const blend=immediate?1:1-Math.exp(-Math.max(.001,dt)*3.2);
+    const was=this.camera.position.distanceToSquared(this.cameraPosition)+this.controls.target.distanceToSquared(this.cameraTarget);
+    this.camera.position.lerp(this.cameraPosition,blend);this.controls.target.lerp(this.cameraTarget,blend);
+    if(was>.000001) this.dirty=true;
+  }
+  setQuality(quality) {
+    this.quality=quality;this.resolutionScale=quality==='smooth'?.85:1;
+    const shadowSize=quality==='cinematic'?2048:quality==='smooth'?1024:1536;
+    if(this.keyLight.shadow.mapSize.x!==shadowSize){this.keyLight.shadow.map?.dispose();this.keyLight.shadow.map=null;this.keyLight.shadow.mapSize.set(shadowSize,shadowSize);}
+    this.film.uniforms.strength.value=quality==='smooth'?.025:.07;this.resize();
+  }
+  samplePerformance(interval) {
+    if(this.quality!=='auto'||interval>180) return;
+    this.frameAverage=(this.frameAverage||33)*.94+interval*.06;
+    this.performanceSamples=(this.performanceSamples||0)+1;
+    if(this.performanceSamples>70&&this.frameAverage>48&&this.resolutionScale>.66){
+      this.resolutionScale=Math.max(.65,this.resolutionScale*.86);this.performanceSamples=0;this.frameAverage=33;this.resize();
+    }
+  }
+  updateModel(t, fluids) {
+    this.progress=t;
+    const face = faceAt(t), exposed = clamp(face, -18, 18), width = 18 - exposed;
+    this.coal.visible = width > .005; this.coal.scale.x = Math.max(.0001, width / 36); this.coal.position.x = exposed + width / 2;
+    this.machine.position.x = face; this.machine.visible = face > -19 && face < 20.5;
+    for (const bed of this.roof) bed.update(t); for (const bed of this.mainRoof) bed.update(t);
+    for(let i=0;i<this.rubbleLocations.length;i++){
+      // Wider reveal window so rubble grows progressively behind the advancing face.
+      const r=this.rubbleLocations[i],reveal=smooth(3.0,9.4,face-r.x),d=this.dummy;
+      d.position.set(r.x,r.y+(1-reveal)*(.55+hash(i+17)*.35),r.z);d.rotation.set(hash(i)*3,hash(i+99)*5,hash(i+210)*2);
+      d.scale.set(r.s*1.8*reveal,r.s*.65*reveal,r.s*reveal);d.updateMatrix();this.rubble.setMatrixAt(i,d.matrix);
+    }
+    this.rubble.instanceMatrix.needsUpdate=true;
+    this.water.visible = this.waterSurface.visible = fluids.level > .001;
+    this.water.scale.y = Math.max(.001, fluids.level); this.water.position.y = this.wellBottom + fluids.level / 2;
+    this.waterSurface.position.y = this.wellBottom + fluids.level;
+    this.meniscus.position.y=this.waterSurface.position.y;this.meniscus.visible=this.waterSurface.visible;
+    this.guides.visible = this.flows.visible = fluids.gas > .005;
+    this.guideMaterial.opacity = .08 * fluids.gas; this.flowMaterial.opacity = .58 + .40 * fluids.gas;
+    this.seepLine.visible = fluids.inflow > .001; this.seepLine.material.opacity = Math.min(.5, fluids.inflow * 2);
+    if(Math.abs(t-this.lastShadow)>.15||this.lastShadow<0){this.renderer.shadowMap.needsUpdate=true;this.lastShadow=t;}
+    this.dirty = true;
+  }
+  animate(elapsed, dt, t, fluids, scenario) {
+    this.time = elapsed * (.12 + fluids.gas * .4);
+    const positions = this.flows.geometry.attributes.position.array;
+    for (let i = 0; i < this.flowCount; i++) {
+      const path = this.flowPaths[i], head = (this.time * .34 + i / this.flowCount) % 1;
+      for (let segment = 0; segment < this.flowSegments; segment++) for (let end = 0; end < 2; end++) {
+        // Slightly shorter comet so overlapping trails near the inlet stay readable.
+        const start = head - .038 + segment * .0065;
+        // Do not draw a segment across the periodic path reset.
+        const offset = end && Math.floor(start) === Math.floor(start + .0065) ? .0065 : 0;
+        const u = ((start + offset) % 1 + 1) % 1, at = u * (path.length - 1), index = Math.floor(at), k = at - index;
+        const a = path[index], b = path[Math.min(index + 1, path.length - 1)], n = ((i * this.flowSegments + segment) * 2 + end) * 3;
+        positions[n] = a.x + (b.x - a.x) * k; positions[n + 1] = a.y + (b.y - a.y) * k; positions[n + 2] = a.z + (b.z - a.z) * k;
+      }
+    }
+    this.flows.geometry.attributes.position.needsUpdate = true;
+    const waterPositions = this.waterSurface.geometry.attributes.position;
+    for (let i = 0; i < waterPositions.count; i++) {
+      const x = waterPositions.getX(i), z = waterPositions.getZ(i), r = Math.hypot(x, z) / this.waterRadius;
+      waterPositions.setY(i, (Math.sin(x * 26 + elapsed * 5.4) + Math.cos(z * 30 - elapsed * 4.2)) * Math.min(.019, fluids.level * .22) * (1 - r * .4));
+    }
+    waterPositions.needsUpdate = true; this.waterSurface.geometry.computeVertexNormals();
+    this.drops.count = fluids.inflow > .001 ? (scenario === 'wet' ? 22 : 5) : 0;
+    const dummy = this.dummy;
+    for (let i = 0; i < this.drops.count; i++) {
+      const u = (elapsed * .34 + i / this.drops.count) % 1;
+      if (u < .38) dummy.position.copy(this.waterRoute.getPoint(u / .38));
+      else {
+        const end = this.wellBottom + fluids.level + .035;
+        // A few small entrained droplets rise; the rest drain to the sump.
+        const up = scenario === 'seep' && i % 3 === 0 && fluids.gas > .3;
+        dummy.position.set(Math.sin(i * 8.3) * .18, up ? 5.8 + (u - .38) / .62 * 7.8 : 6.1 - (6.1 - Math.min(6.08, end)) * ((u - .38) / .62) ** 1.35, 2.42);
+      }
+      dummy.scale.set(.65, 2.2, .65); dummy.rotation.set(0, 0, 0); dummy.updateMatrix(); this.drops.setMatrixAt(i, dummy.matrix);
+    }
+    this.drops.instanceMatrix.needsUpdate = true;
+    this.bubbles.count = fluids.level > MODEL.intakeHeight && fluids.gas > .025 ? 14 : 0;
+    for (let i = 0; i < this.bubbles.count; i++) {
+      const u = (elapsed * .48 + i / this.bubbles.count) % 1;
+      dummy.position.set(Math.sin(i * 5.2 + elapsed) * .15, this.wellBottom + MODEL.intakeHeight + u * (fluids.level - MODEL.intakeHeight), Math.cos(i * 2.7) * .15);
+      dummy.scale.setScalar(.65 + u * .6); dummy.updateMatrix(); this.bubbles.setMatrixAt(i, dummy.matrix);
+    }
+    this.bubbles.instanceMatrix.needsUpdate = true;
+    this.shearer.position.z = -3 + Math.sin(elapsed * .21) * 2.45; this.drums.forEach(drum => { drum.rotation.y = elapsed * 4; });
+    const dust = this.dust.geometry.attributes.position, face = faceAt(t);
+    this.dust.visible = t > 12 && face < 25;
+    for (let i = 0; i < dust.count; i++) { const age = (elapsed * .38 + hash(i)) % 1; dust.setXYZ(i, clamp(face - 5.5 + hash(i + 13) * 2, -18, 18), 2.8 - age * 2.4, hash(i + 182) * 10 - 8); }
+    dust.needsUpdate = true; this.dirty = true;
+  }
+  render() {
+    if(this.renderer._gobAssetsChanged){this.dirty=true;this.renderer._gobAssetsChanged=false;}
+    this.controls.update();
+    if(this.dirty){this.film.render(this.scene,this.camera);this.dirty=false;}
+  }
+  dispose() {
+    this.renderer._gobDisposed=true;this.film.dispose();this.environment.dispose();this.glowMap.dispose();
+    this.controls.dispose(); const geometries = new Set(), materials = new Set(), textures = new Set();
+    this.scene.traverse(object => { if (object.geometry) geometries.add(object.geometry); if (object.material) for (const m of Array.isArray(object.material) ? object.material : [object.material]) materials.add(m); });
+    for (const material of materials) { for (const value of Object.values(material)) if (value?.isTexture) textures.add(value); material.dispose(); }
+    for (const geometry of geometries) geometry.dispose(); for (const texture of textures) texture.dispose(); this.renderer.dispose();
+  }
+}
+
+// ---------- UI and one bounded animation loop; speech can never block time ----------
+const $ = id => document.getElementById(id);
+let cutaway, narrator, raf = 0, resizeRaf = 0, observer;
+const state = { t: 0, playing: false, scenario: 'seep', processMode: DEFAULT_PROCESS_MODE, elapsed: 0, lastFrame: 0, lastDraw: 0, lastRender:0, cueKey: '', scrubbing: false, resumeAfterScrub: false, contextLost: false, disposed: false };
+const tables = Object.fromEntries(['dry', 'seep', 'wet'].map(s => [s, buildFluidTable(s, state.processMode)]));
+function rebuildFluidTables() {
+  for (const s of ['dry', 'seep', 'wet']) tables[s] = buildFluidTable(s, state.processMode);
+}
+let fluids = sampleFluids(tables.seep, 0), cue = cueAt(0, 'seep', fluids);
+const pausePath = 'M6 5h4v14H6zm8 0h4v14h-4z', playPath = 'm8 5 11 7-11 7z';
+let narrationCaptions=null, lastSubtitle='';
+fetch('/audio/chapters.json').then(response=>{if(!response.ok)throw new Error('Captions unavailable');return response.json();}).then(data=>{narrationCaptions=data;refreshUI(true);}).catch(()=>{});
+function updateSubtitle() {
+  const seconds=state.t*SIM_SECONDS/100;
+  const chapter=narrationCaptions?.chapters?.[state.scenario]?.[cue.id];
+  const lines=chapter?.captions||[];
+  let text=cue.text;
+  if(lines.length){text=lines[0].text;for(const line of lines){if(seconds>=line.start)text=line.text;}}
+  if(text!==lastSubtitle){$('subtitle').textContent=text;lastSubtitle=text;}
+  const start=[0,14,42,56,70,86][cue.id],end=[14,42,56,70,86,100][cue.id];
+  $('chapter-progress').style.width=`${clamp((state.t-start)/(end-start))*100}%`;
+}
+
+function refreshUI(force = false) {
+  fluids = sampleFluids(tables[state.scenario], state.t); cue = cueAt(state.t, state.scenario, fluids);
+  $('timeline').value = state.t.toFixed(2); $('timeline').style.setProperty('--progress', `${state.t}%`);
+  $('timeline').setAttribute('aria-valuetext', `${Math.round(state.t)} percent. ${cue.title}.`);
+  $('progress-text').textContent = `${Math.round(state.t)}%`;
+  $('face-value').textContent = (state.t / 100 * MODEL.faceTravel).toFixed(1); $('gas-value').textContent = fluids.gas.toFixed(2);
+  $('water-value').textContent = fluids.level.toFixed(2); $('pressure-value').textContent = fluids.headKPa.toFixed(1);
+  const activeParams = resolveProcessParams(state.processMode);
+  $('gas-meter').style.width = `${fluids.gas * 100}%`; $('water-meter').style.width = `${fluids.level / activeParams.maxWater * 100}%`;
+  const loaded = fluids.level > activeParams.intakeHeight && fluids.headKPa >= activeParams.driveKPa * .90;
+  $('status').textContent = loaded ? 'Water-Loaded' : state.t > 13 ? 'Caving Active' : 'Intact';
+  $('status').dataset.state = loaded ? 'loaded' : state.t > 13 ? 'caving' : 'intact';
+  const key = cue.id + ':' + cue.text;
+  if (force || key !== state.cueKey) {
+    state.cueKey = key; $('chapter').textContent = `${String(cue.id + 1).padStart(2, '0')} / ${cue.title}`;
+  }
+  updateSubtitle();
+  const teach = formatTeachingTelemetry(fluids, state.scenario, state.processMode);
+  $('teaching-banner').textContent = teach.disclaimer;
+  $('inflow-mode').textContent = teach.inflowMode;
+  $('teach-head').textContent = teach.headKPa.toFixed(1);
+  $('teach-gas').textContent = teach.gas.toFixed(2);
+  $('carry-value').textContent = teach.carry.toFixed(3);
+  $('connection-value').textContent = teach.connection.toFixed(2);
+  $('sqrt-law-note').textContent = teach.footnote;
+  const modeTag = teach.processMode === PROCESS_MODES.CALIBRATED ? 'Calibrated-range' : 'Illustrative';
+  $('flow-explanation').textContent = `${modeTag} 12-hour sequence · Water entry ${fluids.inflow.toFixed(3)} L/min · Gas-driven water removal ${fluids.carry.toFixed(3)} L/min. Water height is measured from the bore bottom. See √-law note below.`;
+  $('app').dataset.progress = state.t.toFixed(2);
+  $('app').dataset.processMode = state.processMode;
+}
+function setPlaying(playing) {
+  state.playing = playing && !state.contextLost; state.lastFrame = performance.now(); state.lastDraw = 0;
+  $('play').setAttribute('aria-label', state.playing ? 'Pause simulation' : state.t >= 100 ? 'Replay simulation' : 'Play simulation');
+  $('play').setAttribute('aria-pressed', String(state.playing)); $('play-symbol').setAttribute('d', state.playing ? pausePath : playPath);
+  narrator.sync(state.t,state.playing,state.scenario,true);
+  if (!state.playing) { $('speech-state').textContent = narrator.enabled ? 'Paused · tap Play' : 'Audio muted'; }
+}
+function seek(value) { state.t = clamp(Number(value) || 0, 0, 100);state.elapsed=state.t*SIM_SECONDS/100;refreshUI();narrator.sync(state.t,false,state.scenario,true);cutaway.updateModel(state.t, fluids); cutaway.animate(state.elapsed, 0, state.t, fluids, state.scenario);cutaway.updateCamera(1,state.t,true); }
+function beginScrub() {
+  if (state.scrubbing) return;
+  state.resumeAfterScrub = state.playing; state.scrubbing = true; setPlaying(false);
+}
+function finishScrub() {
+  if (!state.scrubbing) return;
+  state.scrubbing = false; const resume = state.resumeAfterScrub && state.t < 100; state.resumeAfterScrub = false;
+  setPlaying(resume);
+}
+function resize() {
+  cancelAnimationFrame(resizeRaf); resizeRaf = requestAnimationFrame(() => { if (!state.disposed && !state.contextLost) cutaway.resize(); });
+}
+function frame(now) {
+  if (state.disposed || state.contextLost || document.hidden) { raf = 0; return; }
+  raf = requestAnimationFrame(frame);
+  const dt = Math.min(.15, Math.max(0, (now - (state.lastFrame || now)) / 1000)); state.lastFrame = now;
+  if (state.playing && !state.scrubbing) {
+    state.t = advanceTimeline(state.t, dt); state.elapsed = state.t*SIM_SECONDS/100;
+    // Physics/geometry/DOM are bounded to 30 Hz. Orbit damping stays independent.
+    if (now - state.lastDraw >= 1000 / 30 || state.t >= 100) {
+      const interval=state.lastDraw?now-state.lastDraw:33.3;
+      const visualDt = Math.min(.15,interval/1000); state.lastDraw = now;
+      refreshUI(); cutaway.updateModel(state.t, fluids); cutaway.animate(state.elapsed, visualDt, state.t, fluids, state.scenario);
+      narrator.sync(state.t,true,state.scenario);cutaway.samplePerformance(interval);
+    }
+    if (state.t >= 100) { setPlaying(false); $('speech-state').textContent = narrator.enabled ? 'Complete · replay' : 'Complete · muted'; }
+  }
+  // Cap both geometry AND film rendering, including the moving camera.
+  if(now-state.lastRender>=1000/30){
+    cutaway.updateCamera(Math.min(.15,(now-(state.lastRender||now-33.3))/1000),state.t);
+    cutaway.render();state.lastRender=now;
+  }
+}
+function startLoop() { if (!raf && !document.hidden && !state.contextLost && !state.disposed) { state.lastFrame = performance.now(); raf = requestAnimationFrame(frame); } }
+
+// Keep the assumptions accessible even if WebGL or speech is unavailable.
+$('telemetry-toggle').addEventListener('click', () => {
+  const open = $('telemetry').hidden; $('telemetry').hidden = !open;
+  $('telemetry-toggle').setAttribute('aria-expanded', String(open)); $('telemetry-toggle').setAttribute('aria-label', open ? 'Hide telemetry and settings' : 'Show telemetry and settings');
+});
+
+try {
+  narrator = new Narrator($('voice-select'), $('speech-state'));
+  cutaway = new Cutaway($('scene'), $('stage'));
+  refreshUI(true); cutaway.updateModel(0, fluids); cutaway.animate(0, 0, 0, fluids, state.scenario); cutaway.render();
+  cutaway.onViewChange=mode=>{ $('cinema').setAttribute('aria-pressed',String(mode==='cinema'));$('well-view').setAttribute('aria-pressed',String(mode==='well')); };
+  for (const id of ['play', 'timeline', 'audio-button', 'reset', 'home','cinema','well-view']) $(id).disabled = false;
+  $('boot').hidden = true; $('app').dataset.ready = 'true';
+  $('play').addEventListener('click', () => {
+    if (state.playing) { setPlaying(false); return; }
+    if (state.t >= 100) { state.elapsed = 0; seek(0); }
+    // Synchronous in the trusted tap event, before any rendering or awaits.
+    setPlaying(true); startLoop();
+  });
+  $('audio-button').addEventListener('click', () => {
+    narrator.setEnabled(!narrator.enabled); const enabled = narrator.enabled;
+    $('audio-button').setAttribute('aria-pressed', String(enabled)); $('audio-button').setAttribute('aria-label', enabled ? 'Mute narration' : 'Enable narration');
+    $('audio-button').title = enabled ? 'Narration on' : 'Narration muted'; $('audio-waves').toggleAttribute('hidden', !enabled); $('audio-slash').toggleAttribute('hidden', enabled);
+    if (enabled) narrator.sync(state.t,state.playing,state.scenario,true);
+  });
+  $('reset').addEventListener('click', () => { setPlaying(false); state.elapsed = 0; state.scrubbing = false; cutaway.setView('cinema');seek(0); cutaway.time = 0; });
+  $('home').addEventListener('click', () => cutaway.home());
+  $('cinema').addEventListener('click',()=>cutaway.setView('cinema'));
+  $('well-view').addEventListener('click',()=>cutaway.setView('well'));
+  $('quality').addEventListener('change',event=>cutaway.setQuality(event.target.value));
+  // pointerdown covers modern iOS. touchstart supports Safari's trusted gesture
+  // path as well; beginScrub is idempotent, so events never create two streams.
+  $('timeline').addEventListener('pointerdown', beginScrub);
+  $('timeline').addEventListener('touchstart', beginScrub, { passive: true });
+  $('timeline').addEventListener('input', event => { if (!state.scrubbing) beginScrub(); seek(event.target.value); });
+  $('timeline').addEventListener('change', finishScrub);
+  window.addEventListener('pointerup', finishScrub);
+  $('timeline').addEventListener('touchend', finishScrub, { passive: true });
+  $('timeline').addEventListener('pointercancel', () => { state.resumeAfterScrub = false; finishScrub(); });
+  $('timeline').addEventListener('blur', finishScrub);
+  $('water-source').addEventListener('change', event => { state.scenario = event.target.value; narrator.sync(state.t,state.playing,state.scenario,true); refreshUI(true); cutaway.updateModel(state.t, fluids); cutaway.animate(state.elapsed, 0, state.t, fluids, state.scenario); });
+  $('process-mode').addEventListener('change', event => {
+    state.processMode = event.target.value === PROCESS_MODES.CALIBRATED ? PROCESS_MODES.CALIBRATED : PROCESS_MODES.ILLUSTRATIVE;
+    rebuildFluidTables();
+    refreshUI(true);
+    cutaway.updateModel(state.t, fluids);
+    cutaway.animate(state.elapsed, 0, state.t, fluids, state.scenario);
+  });
+  $('scene').addEventListener('keydown', event => {
+    if (event.code === 'Space') { event.preventDefault(); $('play').click(); }
+    if (event.key.toLowerCase() === 'h') cutaway.home();
+  });
+  observer = new ResizeObserver(resize); observer.observe($('stage'));
+  window.addEventListener('resize', resize); window.addEventListener('orientationchange', resize); window.visualViewport?.addEventListener('resize', resize);
+  // Stop spending GPU time in the background; returning never jumps the face.
+  document.addEventListener('visibilitychange', () => { if (document.hidden) { state.scrubbing = false; state.resumeAfterScrub = false; setPlaying(false); cancelAnimationFrame(raf); raf = 0; } else startLoop(); });
+  $('scene').addEventListener('webglcontextlost', event => {
+    event.preventDefault(); state.contextLost = true; setPlaying(false); cancelAnimationFrame(raf); raf = 0;
+    $('boot').hidden = false; $('boot-message').textContent = 'The graphics context was interrupted. Waiting for the browser to restore it…'; $('reload').hidden = false;
+  });
+  $('scene').addEventListener('webglcontextrestored', () => { state.contextLost = false; cutaway.resize(); cutaway.updateModel(state.t, fluids); $('boot').hidden = true; startLoop(); });
+  window.addEventListener('pagehide', event => {
+    setPlaying(false); cancelAnimationFrame(raf); raf = 0;
+    if (!event.persisted) { state.disposed = true; cancelAnimationFrame(resizeRaf); observer.disconnect(); narrator.dispose(); cutaway.dispose(); }
+  });
+  window.addEventListener('pageshow', event => { if (event.persisted) { cutaway.resize(); startLoop(); } });
+  startLoop();
+} catch (error) {
+  console.error('Gob Field Lab could not initialize:', error);
+  $('boot').hidden = false; $('boot-message').textContent = 'The 3D view could not start. Use an up-to-date Safari or Chrome with WebGL enabled, then reload. Subtitles and model notes remain available.'; $('reload').hidden = false;
+  narrator?.dispose(); cutaway?.dispose();
+}
+  </script>
+</body>
+</html>

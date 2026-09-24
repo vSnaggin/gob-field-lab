@@ -1,0 +1,141 @@
+{
+  "voice": "en-US-ChristopherNeural (edge-tts)",
+  "provider": "edge-tts",
+  "generatedAt": "2026-09-24",
+  "duration": 110,
+  "chapters": {
+    "dry": [
+      {
+        "key": "intro",
+        "start": 0,
+        "end": 15.4,
+        "text": "Beneath the surface, solid coal still supports the roof. This cutaway follows one gob well as the longwall approaches. Watch rock, fractures, gas, and water as the face moves past.",
+        "captions": []
+      },
+      {
+        "key": "advance",
+        "start": 15.4,
+        "end": 46.2,
+        "text": "The shearer cuts the coal while hydraulic shields protect the face. Behind them, the unsupported roof breaks and falls. Higher beds bend and separate over the gob.",
+        "captions": []
+      },
+      {
+        "key": "passing",
+        "start": 46.2,
+        "end": 61.6,
+        "text": "The face has passed the well. A strong gas connection depends on roof movement and connected fractures \u2014 not face position alone.",
+        "captions": []
+      },
+      {
+        "key": "gas",
+        "start": 61.6,
+        "end": 77.0,
+        "text": "Pale trails show gas moving toward the well. Methane itself is invisible. Fractures feed the casing under a pressure difference. ILLUSTRATIVE \u00b7 not calibrated.",
+        "captions": []
+      },
+      {
+        "key": "dry",
+        "start": 77.0,
+        "end": 94.6,
+        "text": "In the dry case there is no connected water. Gas keeps flowing through the fractured rock as the gob settles. No liquid head forms at the well.",
+        "captions": []
+      },
+      {
+        "key": "settled",
+        "start": 94.6,
+        "end": 110.0,
+        "text": "Broken rock settles and the upper roof sags. Some fractures may stay open. ILLUSTRATIVE \u00b7 not calibrated \u2014 real wells need measured production, water, and pressure.",
+        "captions": []
+      }
+    ],
+    "seep": [
+      {
+        "key": "intro",
+        "start": 0,
+        "end": 15.4,
+        "text": "Beneath the surface, solid coal still supports the roof. This cutaway follows one gob well as the longwall approaches. Watch rock, fractures, gas, and water as the face moves past.",
+        "captions": []
+      },
+      {
+        "key": "advance",
+        "start": 15.4,
+        "end": 46.2,
+        "text": "The shearer cuts the coal while hydraulic shields protect the face. Behind them, the unsupported roof breaks and falls. Higher beds bend and separate over the gob.",
+        "captions": []
+      },
+      {
+        "key": "passing",
+        "start": 46.2,
+        "end": 61.6,
+        "text": "The face has passed the well. A strong gas connection depends on roof movement and connected fractures \u2014 not face position alone.",
+        "captions": []
+      },
+      {
+        "key": "gas",
+        "start": 61.6,
+        "end": 77.0,
+        "text": "Pale trails show gas moving toward the well. Methane itself is invisible. Fractures feed the casing under a pressure difference. ILLUSTRATIVE \u00b7 not calibrated.",
+        "captions": []
+      },
+      {
+        "key": "seep",
+        "start": 77.0,
+        "end": 94.6,
+        "text": "A small seep drains down the casing and pools below the gas inlet. Some droplets ride up with the gas. A small pool is not a full liquid barrier. ILLUSTRATIVE.",
+        "captions": []
+      },
+      {
+        "key": "settled",
+        "start": 94.6,
+        "end": 110.0,
+        "text": "Broken rock settles and the upper roof sags. Some fractures may stay open. ILLUSTRATIVE \u00b7 not calibrated \u2014 real wells need measured production, water, and pressure.",
+        "captions": []
+      }
+    ],
+    "wet": [
+      {
+        "key": "intro",
+        "start": 0,
+        "end": 15.4,
+        "text": "Beneath the surface, solid coal still supports the roof. This cutaway follows one gob well as the longwall approaches. Watch rock, fractures, gas, and water as the face moves past.",
+        "captions": []
+      },
+      {
+        "key": "advance",
+        "start": 15.4,
+        "end": 46.2,
+        "text": "The shearer cuts the coal while hydraulic shields protect the face. Behind them, the unsupported roof breaks and falls. Higher beds bend and separate over the gob.",
+        "captions": []
+      },
+      {
+        "key": "passing",
+        "start": 46.2,
+        "end": 61.6,
+        "text": "The face has passed the well. A strong gas connection depends on roof movement and connected fractures \u2014 not face position alone.",
+        "captions": []
+      },
+      {
+        "key": "gas",
+        "start": 61.6,
+        "end": 77.0,
+        "text": "Pale trails show gas moving toward the well. Methane itself is invisible. Fractures feed the casing under a pressure difference. ILLUSTRATIVE \u00b7 not calibrated.",
+        "captions": []
+      },
+      {
+        "key": "wet",
+        "start": 77.0,
+        "end": 94.6,
+        "text": "Water enters faster than gas can remove it. Watch the pool rise at the well. Once the inlet is covered, liquid head adds backpressure \u2014 ILLUSTRATIVE \u221a-law under fourteen kilopascals, not calibrated.",
+        "captions": []
+      },
+      {
+        "key": "loaded",
+        "start": 94.6,
+        "end": 110.0,
+        "text": "Liquid head consumes the assumed fourteen kilopascal drive, and gas delivery stops in this example. ILLUSTRATIVE \u00b7 not calibrated \u2014 real loading needs measured pressures and water supply.",
+        "captions": []
+      }
+    ]
+  },
+  "rebake": "Spoken audio matches teaching-clarity copy (ILLUSTRATIVE / \u221a-law). Mild atempo only if a clip exceeds its fixed slot."
+}

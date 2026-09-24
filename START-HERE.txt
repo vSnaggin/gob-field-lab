@@ -1,0 +1,42 @@
+GOB FIELD LAB — COMPLETE SOURCE PACKAGE
+Exported September 24, 2026
+Source revision: b7d5e40a64ccdd91fd06958e5ce1eb3f067ce34f
+
+START HERE
+The active simulation, visual design, and playback controller are in
+public/index.html. Its required assets are bundled in public/vendor,
+public/textures, and public/audio. Keep these folders together.
+
+The audio files are the recorded HeyGen narration used by the published site.
+No HeyGen account or API key is required to play these bundled recordings.
+
+RUN ON A COMPUTER
+Unzip this folder. From the Gob-Field-Lab folder, run:
+  python3 -m http.server 4173 --directory public
+Then open http://localhost:4173 in a browser with WebGL support.
+On Windows with the Python launcher, use py instead of python3.
+
+HOST FOR IPHONE / IPAD
+Serve the contents of public/ as the root of a static HTTPS website.
+A Node.js server is not needed for production. Open the website in Safari.
+This exact source package loads local asset paths and is not a single-file
+HTML app. iOS Files / ChatGPT file previews are for viewing the source;
+they are not the supported way to run this WebGL simulation.
+
+YOUR EXISTING PRIVATE SITE
+https://gob-field-lab-jh.snaggxn.chatgpt.site
+
+DEVELOPMENT
+See README.md for architecture, model limits, and validation details.
+package.json and package-lock.json describe the optional Vite development
+server. The production application uses the bundled Three.js modules.
+Tests and asset-generation scripts are included. The existing app.js,
+model.js, and styles.css are retained for source history and legacy tests;
+the active published runtime is the inline module in public/index.html.
+The narration-build helper needs HeyGen speech metadata to regenerate clips;
+the completed MP3s are already included and need no regeneration.
+
+PROVENANCE
+Tracked source files are unchanged from the revision above. SHA256SUMS.txt
+records their checksums. The export adds only this guide and the checksum file.
+The bundled Three.js license is in public/vendor/THREE-LICENSE.txt.
